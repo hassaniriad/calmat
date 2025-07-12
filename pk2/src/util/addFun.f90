@@ -26,7 +26,7 @@ MODULE addfun_m
 
    integer  (Ikind)              :: ui = 0, uo = 0, uof = 0, nfunc = 0
 
-   character(len=:), allocatable :: fileName, libName, rec, rec0, moduledir
+   character(len=:), allocatable :: fileName, libName, moduledir
    type     (str_t), allocatable :: listfun(:,:)
    integer  (Ikind), allocatable :: nargfun(:,:)
    
@@ -56,7 +56,7 @@ CONTAINS
    integer                       :: lenkwd, err
    character(LGSTR)              :: iomsg
    logical                       :: waitForEndFunc
-   character(len=:), allocatable :: str, buf
+   character(len=:), allocatable :: str, buf, rec, rec0
 !---------------------------------------------------------------------------------------------   
 
    lenkwd = len(KWDEND)
@@ -158,7 +158,7 @@ CONTAINS
                exit
             end if
             
-            call functionBody ( stat )
+            call functionBody ( rec, rec0, stat )
             
             if ( stat > IZERO ) then ; call stat%AddTrace(HERE) ; exit ; end if
          end if
@@ -193,7 +193,7 @@ CONTAINS
 
          end if
          
-         call functionHeader ( stat )
+         call functionHeader ( rec, stat )
          
          if ( stat > IZERO ) then ; call stat%AddTrace(HERE) ; exit ; end if
          
@@ -229,9 +229,10 @@ CONTAINS
    
    
 !=============================================================================================
-   SUBROUTINE functionBody ( stat )
+   SUBROUTINE functionBody ( rec, rec0, stat )
 !=============================================================================================
-   type(err_t), intent(in out) :: stat
+   character(len=:), allocatable, intent(in out) :: rec, rec0
+   type     (err_t),              intent(in out) :: stat
 !--------------------------------------------------------------------------------------------- 
 !
 !--------------------------------------------------------------------------------------------- 
@@ -344,7 +345,7 @@ CONTAINS
          body(nline) = body(nline) + ', ' + subRec(i,1) 
       end do             
       
-      call functionDeclar ( typ, rhs, stat ) ; error_TraceNreturn(stat, HERE)
+      call functionDeclar ( typ, rhs, rec, stat ) ; error_TraceNreturn(stat, HERE)
       
       body(nline) = indent + body(nline) + (' :: ' // rhs)
 
@@ -360,10 +361,10 @@ CONTAINS
 
 
 !=============================================================================================
-   SUBROUTINE functionDeclar ( typ, vars, stat )
+   SUBROUTINE functionDeclar ( typ, vars, rec, stat )
 !=============================================================================================
    integer  (Ikind), intent(in    ) :: typ
-   character(len=*), intent(in    ) :: vars
+   character(len=*), intent(in    ) :: vars, rec
    type     (err_t), intent(in out) :: stat  
 !--------------------------------------------------------------------------------------------- 
 !  ex.: typ = 2 and vars = "x(:,:), y(:), z, w(2) = [1.,2.]"
@@ -479,9 +480,10 @@ CONTAINS
    
    
 !=============================================================================================
-   SUBROUTINE functionHeader ( stat )
+   SUBROUTINE functionHeader ( rec, stat )
 !=============================================================================================
-   type(err_t), intent(in out) :: stat
+   character(len=*), intent(in    ) :: rec
+   type     (err_t), intent(in out) :: stat
 !--------------------------------------------------------------------------------------------- 
 !  Given the function interface (e.g. rec = '[x,y] = myfun(a,b,c)'), it extracts the function
 !  name (funcName), the number (nvarIn, nvarOut) of the input and output variables and their 
