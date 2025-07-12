@@ -1,0 +1,8 @@
+clear
+a = rand()
+if a < 0.5 then
+   exec "exec_in_if1"
+else
+   exec "exec_in_if2"
+endif
+

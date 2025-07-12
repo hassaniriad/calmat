@@ -1,0 +1,65 @@
+// Example using calmat -- Sorting array elements
+//                         (you can see the list of functions by list 'fun')
+//
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec('basic3')
+//
+//   (or manually copy/paste the lines of the file basic3)
+//
+//  -in batch mode: in a terminal window, type
+//
+//              calmat -i basic3 -o out -b
+
+   disp(' ')
+   disp('<< Start basic3 >>')
+   clear
+
+/////////////////////////////////////////////////////////////////////////
+// Sort a vector
+/////////////////////////////////////////////////////////////////////////
+   
+   v = rand(1,10) 
+   
+   disp("sort v in increasing order (w=sort(v) or w=sort(v,'i')):")
+   w = sort(v) 
+
+   disp("sort v in decreasing order (w=sort(v,'d')):")
+   w = sort(v,'d')
+
+   disp("sort v and get the original indices: [w,i] = sort(v):")
+   [w,i] = sort(v) 
+   disp(v(i) == w,'Verify (F/T): v(i) == w?: ')
+
+   disp('Same things with an array of strings:')
+   v = ['xlf', 'gfortran', 'ifort', 'Xlf', 'nagfor', 'gfortraN', 'PathScale']
+   disp('sort v in increasing order (alphabetical and case sensitive):')
+   w = sort(v) 
+
+   disp('sort v in increasing order and case insensitive:')
+   w = sort(v,'CaseInsensitive') 
+
+   disp('sort v in decreasing order and case insensitive:')
+   w = sort(v,'CaseInsensitive','d') 
+
+/////////////////////////////////////////////////////////////////////////
+// Sort a matrix
+/////////////////////////////////////////////////////////////////////////
+
+   disp('Let now V = magic(5):')
+   V = magic(5)
+
+   disp("Sort columns of V in increasing order: sort(V)=sort(V,1)=sort(V,1,'i')")
+   W = sort(V)
+
+   disp("Sort rows of V in increasing order: sort(V,2)=sort(V,2,'i')")
+   W = sort(V,2)
+
+   disp("Sort rows of V in decreasing order and get the original ...
+         column indices in each row: [W,I] = sort(V,2,'d'):")
+   [W,I] = sort(V,'d',2)
+
+   disp('<< End basic3 >>')

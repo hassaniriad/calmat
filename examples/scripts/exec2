@@ -1,0 +1,5 @@
+
+disp('start exec2') // 1
+disp(i)
+c=c+i               // 2
+disp('end exec2')   // 3

@@ -1,0 +1,52 @@
+disp(' ')
+disp(' << Start heat >>')
+clear
+
+L = 40; a1 = 4; a2 = 50; T0 = 46; Te = 20; k = 0.164;
+hc = 1.e-6*200 ;
+act = 2.0*(a1+a2)*hc*L*L / (k*a1*a2) ;
+
+M = 31; h = 1./(M-1) ;
+
+theta =zeros(M,1) ; 
+
+theta1 = (T0-Te)/Te; // condition en x = 0
+theta = zeros(M,1) ; x = zeros(M,1);
+
+// initialisation (variation linéaire entre theta1 et 0):
+x = ((1:M)-1)*h ; theta = (1-x)*theta1 ; 
+
+// Résolution par Gauss-Seidel:
+disp(M,"Résolution par Gauss-Seidel. Nombre d'inconnues : ")
+coef = 1 / (2+h*h*act) ; 
+conv = %f ; itermax = M*1000;
+for iter = 1:itermax
+    dtheta = 0;
+    for i = 2:M-1
+        xnew = (theta(i-1)+ theta(i+1)) * coef ;
+        dtheta = dtheta + (xnew-theta(i))^2 ;
+        theta(i) = xnew ;
+    endfor
+    xnew = theta(M-1);
+    dtheta = dtheta + (xnew -theta(M))^2 ;
+    theta(M) = xnew;
+    disp([iter,sqrt(dtheta)])
+    if sqrt(dtheta) < 1e-4 then
+       conv = %t ;
+       break
+    endif
+endfor
+
+if conv then
+   disp(iter,"Nombre d'itérations (Gauss-Seidel) nécessité: ")
+else
+   disp("Nombre insuffisant d'itérations pour satisfaire le critère d'arrêt pour Gauss-Seidel")
+endif
+
+// Solution analytique:
+thetaa=(T0-Te)*cosh( sqrt(act) * (1- x))/ cosh(sqrt(act)) + Te;
+
+x = x*L; theta = Te*(1+ theta) ; 
+plot( x, theta, 'ob' , x, thetaa, 'r' )
+
+disp(' << End heat >>')

@@ -1,0 +1,5 @@
+disp('ex1: start')
+exec "ex2"
+exec "ex3"
+disp('ex1: end')
+

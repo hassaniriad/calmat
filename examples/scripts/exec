@@ -1,0 +1,12 @@
+
+disp('EXEC start')
+
+clear
+
+a = 1, b = 5 ; file = 'exec0' 
+
+c=0 , exec('exec0') ; d=c+1
+
+m = e+1 // ne doit pas generer une erreur (e definie dans exec0)
+
+disp('EXEC end')

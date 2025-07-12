@@ -1,0 +1,123 @@
+//
+// This is an example of file containing user functions that can be added to the 
+// pk2 librairie by using addfun (see the help of addfun using -h)
+//
+// The syntax for declaring a function follows that of Scilab, except for the use
+// of the keywords "fortranproc" and "endfortranproc" in place of "function" and
+// "endfunction": the output arguments are specified between square brackets (not
+// (needed if only one ouput argument) and the input arguments are between 
+// parentheses after the name of the function:  
+//         fortranproc [ out1, out2, ...  ] = funcName ( in1, in2, in3, ...)
+//
+// The body of the function is given in very basic Fortran langage as illustrated
+// by the following examples.
+//
+// Accepted types (don't worry about their kind) for input/output arguments
+//    . integer, 
+//    . real, 
+//    . complexe, 
+//    . logical,
+//    . type(str_t) (see module str_m).
+//
+// The type(str_t) is used for string (don't use "character" except for local 
+// variables)
+//
+
+
+// A function with 0 input and 0 output argument:
+
+fortranproc hello
+   print*,'hello world!'
+endfortranproc
+
+// A function with 1 scalar input and 1 scalar output arguments:
+
+fortranproc y = foo0(x)
+   real :: x, y
+   y = x**2 + 2*x + 1
+endfortranproc
+
+
+// At present, output array argument must have an explicit shape (e.g. y(3,2))
+// or must be an allocatable.
+
+
+// A function with a rank 1 input and an allocatable rank 1 output arguments:
+
+fortranproc y = foo1(x)
+   real              :: x(:)
+   real, allocatable :: y(:)
+
+   if ( allocated(y) ) then
+      if ( size(y) /= size(x) ) deallocate(y)
+   end if
+
+   if ( .not. allocated(y) ) allocate(y, mold=x)
+   y = (x-1)*(x-3)
+endfortranproc
+
+
+// A function with 3 inputs and 2 outputs (a scalar x + a matrix M):
+
+fortranproc [ x, M ] = foo2 ( vec, b, c )
+   real :: vec(3), b, c ! inputs
+   real :: x, M(2,2) ! outputs
+
+   real :: s, p ! locals
+
+   s = vec(1)+b+c ; p = vec(2)*b*c
+   x = s + 3*p
+   M(1,:) = [ sin(x) / ( s + 1.23 ), cos(x) ]
+   M(2,:) = [ exp(M(1,1)) , M(1,1)+M(1,2) ]
+endfortranproc foo2
+
+
+// Others:
+
+fortranproc [ regular, x, detA, invA ] = solve3x3 ( A, b )
+   real    :: A(3,3), b(3), x(3), invA(3,3), detA
+   logical :: regular
+!----------------------------------------------------------------------------------- 
+! Solves the 3x3 linear system A*x = b using 3 cross products and 1 dot product
+! Returns regular = .false. if the matrix is (near-) singular
+! Computes also (if A is not singular) the inverse of A
+! If A is singular sets a warning and returns
+!----------------------------------------------------------------------------------- 
+
+!- local variables -----------------------------------------------------------------
+   real, parameter :: TOLDET = 1e-10
+!----------------------------------------------------------------------------------- 
+   regular = .true.
+   invA(:,1) = cross ( A(2,:), A(3,:) )
+   detA = dot ( invA(:,1), A(1,:) )
+   if ( abs(detA) <= TOLDET * maxval(abs(A)) ) then
+      regular = .false.
+      opflag = err_t(stat=WARNING,where='solve3x3b',msg=&
+                    'could not solve the system, the matrix is singular or near singular')
+      return
+   end if
+   invA(:,1) = invA(:,1) / detA
+   invA(:,2) = cross ( A(3,:), A(1,:) ) / detA
+   invA(:,3) = cross ( A(1,:), A(2,:) ) / detA
+   x = b(1)*invA(:,1) + b(2)*invA(:,2) + b(3)*invA(:,3)
+   
+   contains 
+!
+!-   internal functions of solve3x3:
+!
+     function cross ( x, y ) result(z)
+       real, intent(in) :: x(3), y(3)
+       real             :: z(3)
+       z(1) = x(2)*y(3) - x(3)*y(2)
+       z(2) =-x(1)*y(3) + x(3)*y(1)
+       z(3) = x(1)*y(2) - x(2)*y(1)
+     end function cross
+
+     function dot ( x, y ) result(s)
+       real, intent(in) :: x(3), y(3)
+       real,            :: s
+       s = x(1)*y(1) + x(2)*y(2) + x(3)*y(3)
+     end function dot
+endfortranproc solve3x3
+
+

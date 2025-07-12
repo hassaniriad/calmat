@@ -1,0 +1,8 @@
+# A file containing column data of various type
+# (warning, string must be quoted if the file is not read with typ='s')
+#
+# FirstName    Names        Male    Age  
+  'John'       'Steed'       .t.     34   
+  'Emma'       'Peel'        .f.     29
+  'Elizabeth'  'Shepherd'    .f.     25
+  'Patrick'    'Macnee'      .t.     36

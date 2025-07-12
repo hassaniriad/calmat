@@ -1,0 +1,6 @@
+disp("we are in the script << if_in_exec1 >>")
+if a > 0.5 then
+   disp("we are in the branch a > 0.5")
+else
+   disp("we are in the branch a <= 0.5")
+endif

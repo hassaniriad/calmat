@@ -1,0 +1,119 @@
+// Example using calmat to read and write matrices 
+//
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec('readwrite')
+//
+//  -in batch mode: in a terminal window, type
+//
+//              calmat -i readwrite -o out -b
+
+   disp(' ')
+   disp('<< Start readwrite >>')
+   clear
+
+   mydir = pwd ; 
+   disp(mydir,'The current directory is: ')
+
+   dir = mydir + '/files/matx/' ;
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 1) Reading a file containing a matrix in the form [ ... , ... ; ... , ... ]
+////////////////////////////////////////////////////////////////////////////////////////
+
+// 1.1) in the file foo0.txt, the symbol '#' is used for comments which is the default:
+
+   A = readmat(file = dir+"foo0.txt")
+
+// 1.2) while in the file foo1.txt, the symbol '// is used for comments:
+
+   A = readmat(file = dir+"foo1.txt", comment = "//")    
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 2) Reading a file containing a matrix column-organized
+////////////////////////////////////////////////////////////////////////////////////////
+
+// 2.1) we known the data type (here real) and the number of columns and lines: 
+
+   A = readmat(file = dir+"foo2.txt", typ = 'r', nrow = 8, ncol = 6)
+
+// 2.2) we known the data type (here real) and the number of columns 
+//     but not the number of lines: 
+
+   A = readmat(file = dir+"foo2.txt", typ = 'r', nrow =-1, ncol = 6)
+
+// 2.3) we known the data type (here real) and the number of columns 
+//      and we read only the 3 first rows: 
+
+   A = readmat(file = dir+"foo2.txt", typ = 'r', nrow = 3, ncol = 6)
+
+// 2.4) we known the data type (here real), we read only the 3 first rows
+//      but we don't know the number of columns:
+
+   A = readmat(file = dir+"foo2.txt", typ = 'r', nrow = 3, ncol =-1)
+
+// 2.5) we known the data type (here real), we read all rows 
+//      but only the selected columns:
+
+   A = readmat(file = dir+"foo2.txt", typ = 'r', nrow =-1, col = [6,1,3])
+
+// 2.6) we don't know the type, nor the number of rows nor the number of columns:
+
+   A = readmat(file = dir+"foo2.txt", nrow =-1, ncol =-1)
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 3) Reading a file containing a matrix colum-organized but of heterogeous type
+////////////////////////////////////////////////////////////////////////////////////////
+
+// 3.1) read all data in string matrix:
+
+   A = readmat(file = dir+"foo3.txt", nrow =-1, ncol =-1, typ = 's')
+
+// 3.2) read only the 2 first columns (of same type, here string):
+
+   A = readmat(file = dir+"foo3.txt", nrow =-1, col =[1,2])
+
+// 3.3) read only the 3rd column (here logical):
+
+   A = readmat(file = dir+"foo3.txt", nrow =-1, col =[3])
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 4) Reading and converting
+////////////////////////////////////////////////////////////////////////////////////////
+
+// 4.1) foo4.txt contains numeric data of integers, reals and complexes
+ 
+    A = readmat(file = dir+"foo4.txt", nrow=-1, ncol=-1, typ='s')
+
+// 4.2) we can directly read it as a matrix of complexes.
+    
+    A = readmat(file = dir+"foo4.txt", nrow=-1, ncol=-1)
+
+// 4.3) we can read only columns 1 and 3 (here of integers)
+
+    A = readmat(file = dir+"foo4.txt", nrow=-1, col=[1,3])
+
+// 4.4) we can force the result to be of a given type, for example complex:
+
+    A = readmat(file = dir+"foo4.txt", nrow=-1, col=[1,3], convert = 'c')
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 5) Writing 
+////////////////////////////////////////////////////////////////////////////////////////
+
+   A = readmat(file = dir+"foo3.txt", nrow =-1, col =[3,1], typ = 's')
+
+   writemat(mat=A, file=dir+'out3a')
+
+   writemat(mat=A, file=dir+'out3b',title='Male (true/false)  First Name')
+
+   writemat(mat=A, file=dir+'out3c',title='Male (true/false)  First Name', ...
+            format='(2a15)')
+
+   writemat(mat=A, file=dir+'out3d',title='Male (true/false)  First Name', ...
+            format='(2a15)',size=%t,comment='//')
+
+   disp('<< End readwrite >>')

@@ -1,0 +1,4 @@
+disp('hello from script5')
+a5 = 'a in script5'
+b5 = 'b in script5'
+disp('leave script5')

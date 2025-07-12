@@ -1,0 +1,13 @@
+clear
+n = 100
+a = 0
+t0 = cputime()
+for i = 1:n
+//  way 1: this is not a good idea, since the instructions are reloaded and reparsed at each iteration
+//  (because the parser doesn't know if the variable "f" has changed):
+    f = 'exec_in_loop1';
+    exec(f)
+//  way 2: in this case the instructions are parsed only once:
+    //exec('exec_in_loop1')
+endfor
+disp(cputime()-t0,'ellapsed time: ')

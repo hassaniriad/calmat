@@ -1,0 +1,5 @@
+clear
+a = rand()
+exec "if_in_exec1"
+disp("back to the main script")
+

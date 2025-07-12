@@ -1,0 +1,12 @@
+(calmat) ~> c=0
+(calmat) ~> m.x=1
+(calmat) ~> m.y=2
+(calmat) ~> m=3
+
+c = 0
+
+ = 1
+
+ = 2
+
+m = 3

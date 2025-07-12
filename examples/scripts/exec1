@@ -1,0 +1,9 @@
+
+c=0               // 1
+for i=1:5         // 2
+    //disp(i)       // 3
+    exec 'exec2'  // 4
+endfor            // 5
+disp(c)           // 6
+
+

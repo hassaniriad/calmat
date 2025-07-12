@@ -1,0 +1,138 @@
+
+   clear
+
+   t0 = cputime();
+   
+   disp('<< Hello from newton2 >>')
+
+
+
+   nmax = 300 ; eps_dX = 1e-8 ; eps_f = 1e-10 ; kconv = 0 ;
+
+   X = [ 5. ; 5. ; 5. ] ; // the starting point
+
+// Newton iterations:
+
+   for k = 1:nmax
+
+       // call to user's functions:
+
+       //fX = f(X) ; JfX = Df(X);
+       [fX, JfX] = mysystem(X) ;
+       //[fX, JfX] = mysystem2 ( X(1), X(2), X(3) ) ;
+       
+       // Compute the correction:
+
+       dX =-JfX \ fX ;
+
+       // New estimate of X:
+
+       X = X + dX ;
+
+       s = 'k = ' + num2str(k) + ': || dX || = ' + num2str(norm(dX)) + ...
+           ', || f || = ' + num2str(norm(fX)) ;
+       disp(s)
+
+       // Convergence criteria:
+
+       if norm(dX) < eps_dX*norm(X) | norm(fX) < eps_f then
+          kconv = k ;
+          break
+       endif
+
+   endfor
+
+   // Print the solution found:
+
+   if (kconv == 0) then
+      disp('Warning: not converged in nmax = ' + num2str(nmax) + ' iterations.')
+   else
+      disp('Converged in ' + num2str(kconv) + ' iterations.')
+   endif
+
+   disp(X,'Solution found: ')
+   disp(norm(fX),'Residual norm: ')
+   disp("cpu time: "+num2str(cputime()-t0))
+   disp('<< End newton2 >>')
+
+
+// ====================================================================
+// ======================  Function Definition  =======================
+// ====================================================================
+
+// Users define their functions wherever they like.
+// Apart from the headers, which define the function interface, 
+// the function bodies are “basic” Fortran instructions.
+
+   fortranproc  [ u ] = f(v)
+      real :: v(:)
+      real :: u(3)
+
+      // The user can declare constants and local variables:
+
+      real, parameter :: c1=1, c2=2, c3=3, c5=5, c7=7
+      real :: x, y, z
+
+      // The user can handle any errors via the “opflag” module variable:
+
+      if ( size(v) < 3 ) then
+         opflag = err_t ( stat = UERROR, where = 'f', msg = 'size(v) < 3' )
+         return
+      end if
+
+      x = v(1) ; y = v(2) ; z = v(3)
+
+      u = [ sin(x) + y**2 + log(z) - c7, &
+            c3*x   + c2*y - z**3   + c1, &
+            x      + y    + z      - c5 ]
+   endfortranproc
+
+   fortranproc [ M ] = Df(v)
+      Real :: v(:)
+      real :: M(3,3)
+
+      real :: x, y, z
+
+      x = v(1) ; y = v(2) ; z = v(3)
+
+      M(1,:) = [ real:: cos(x), 2*y, 1/z    ]
+      M(2,:) = [ real:: 3     , 2  ,-3*z**2 ]
+      M(3,:) = [ real:: 1     , 1  , 1      ]
+   endfortranproc
+
+// A function with two output arguments:
+
+   fortranproc [ u, M ] = mysystem ( v )
+      real :: v(:), u(3), M(3,3)
+
+      real :: x, y, z
+
+      if ( size(v) < 3 ) then
+         opflag = err_t ( stat = UERROR, where = 'mysystem', msg = 'size(v) < 3' )
+         return
+      end if
+
+      x = v(1) ; y = v(2) ; z = v(3)
+
+     u = [ real:: sin(x) + y**2 + log(z) - 7, &
+                  3*x    + 2*y  - z**3   + 1, &
+                  x      + y    + z      - 5 ]
+
+      M(1,:) = [ real:: cos(x), 2*y, 1/z    ]
+      M(2,:) = [ real:: 3     , 2  ,-3*z**2 ]
+      M(3,:) = [ real:: 1     , 1  , 1      ]
+   endfortranproc mysystem
+
+// A funcction with two output arguments and three input arguments:
+
+   fortranproc [ u, M ] = mysystem2 ( x, y, z )
+      real :: x, y, z, u(3), M(3,3)
+
+     u = [ real:: sin(x) + y**2 + log(z) - 7, &
+                  3*x    + 2*y  - z**3   + 1, &
+                  x      + y    + z      - 5 ]
+
+      M(1,:) = [ real:: cos(x), 2*y, 1/z    ]
+      M(2,:) = [ real:: 3     , 2  ,-3*z**2 ]
+      M(3,:) = [ real:: 1     , 1  , 1      ]
+   endfortranproc mysystem2

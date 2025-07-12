@@ -1,0 +1,23 @@
+bonjour le monde
+# this will be interpreted as a comment if the "#" is choosen to insert a comment
+Hello World
+Hallo Welt # a line ending with a comment
+Ciao mondo ("#" this is not a comment because the hashtag is enclosed between quotes)
+hola Mundo
+
+# A record on several lines (continuation symbol : ...)
+This is a multi-line ...
+record that ...
+uses the ...
+continuation symbol '...'
+
+Bye
+Adiós
+Tschüss
+Ciao
+Sayonara
+Au revoir !
+// may also be a comment if "//" is choosen in place of "#" (in fact any set of symbols may be used)
+#end of my file
+//end of my file
+

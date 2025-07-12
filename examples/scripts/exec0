@@ -1,0 +1,12 @@
+disp('exec0 start')
+
+//for i = a:b
+//    c = c + i
+//endfor
+c = c + a + b
+
+e = 100
+
+//truc = d // doit generer une erreur (d indefinie)
+
+disp('exec0 end')

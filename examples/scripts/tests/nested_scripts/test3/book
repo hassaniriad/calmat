@@ -1,0 +1,10 @@
+// test nested scripts
+exec "prologue"
+disp(". Introduction")
+disp(". Chapter I")
+disp(". Chapter II")
+exec "sections_of_chapter_II"
+disp(". Chapter III")
+disp(". Chapter IV")
+exec "epilogue"
+disp("The End")

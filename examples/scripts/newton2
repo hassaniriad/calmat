@@ -1,0 +1,95 @@
+// Example using calmat -- Usage of for-loop and if-test constructs
+//
+// Find a solution of the 3x3 non-linear system 
+//       
+//      | sin(x) + y^2 + log(z) = 7
+//      | 3*x    + 2*y - z^3    =-1
+//      |  x     +   y + z      = 5
+//
+// by the Newton method.
+
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec 'newton2'
+//
+//   (or manually copy/paste the lines of the file newton2)
+//
+//
+//  -in batch mode using the command line argument of calmat: 
+//   in a terminal window, type
+//
+//              calmat -i newton2 -o out
+
+   disp(' ')
+   disp('<< Start newton2 >>')
+
+   clear
+
+   disp(...
+     ["Find a solution of the 3x3 non-linear system ";...
+      "    ";...
+      "     | sin(x) +   y^2 + log(z) = 7 ";...
+      "     | 3*x    + 2*y   - z^3    =-1 ";...
+      "     |  x     +   y   + z      = 5 ";...
+      "                                   ";...
+      "using the Newton's Method starting from x=5, y=5, z=5.";...
+      "   "])
+
+   nmax = 300 ; eps_dX = 1e-8 ; eps_f = 1e-10 ; kconv = 0 ;
+
+   X = [5;5;5] ; // starting point
+
+// Newton iterations:
+
+   for k = 1:nmax
+
+       x = X(1) ; y = X(2) ; z = X(3) ;
+       
+       // The function f(X) = 0:
+
+       f  = [ sin(x) + y^2 + log(z) - 7 ; ...
+              3*x    + 2*y - z^3    + 1 ; ...
+              x      + y   + z      - 5 ] ; 
+
+       // Its Jacobian:
+
+       Jf = [ cos(x) 2*y   1/z  ; ...
+              3      2   -3*z^2 ; ...
+              1      1      1   ] ;
+
+       // Compute the correction:
+
+       dX =-Jf \ f ;
+
+       // New estimate of X:
+
+       X = X + dX ;
+
+       s = 'k = ' + num2str(k) + ': || dX || = ' + num2str(norm(dX)) + ...
+           ', || f || = ' + num2str(norm(f)) ;
+       disp(s)
+
+       // Convergence criteria:
+
+       if norm(dX) < eps_dX*norm(X) | norm(f) < eps_f then
+          kconv = k ;
+          break
+       endif
+
+   endfor
+
+   // Print the solution found:
+
+   if (kconv == 0) then
+      disp('Warning: not converged in nmax = ' + num2str(nmax) + ' iterations.')
+   else
+      disp('Converged in ' + num2str(kconv) + ' iterations.')
+   endif
+
+   disp(X,'Solution found: ')
+   disp(norm(f),'Residual norm: ')
+   disp("")
+   disp('<< End newton2 >>')

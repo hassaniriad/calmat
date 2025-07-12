@@ -1,0 +1,33 @@
+// Example using calmat to approximate a derivative
+//
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec 'derivative'
+//
+//  -in batch mode: in a terminal window, type
+//
+//              calmat -i derivative -o out -b
+
+
+   disp(' ')
+   disp('<< Start derivative >>') 
+   clear
+
+// Let f(x) = erf(x). Its second derivative is f''(x) = -4*x*exp(-x^2)/(sqrt(%pi))
+
+// We use here a centered scheme to approximate f'' in [0,4] with a step h = 0.1:
+
+   h = 0.1 ; n = nint(4/h) + 1 ; x = (0:h:4)' ; f = erf(x) ;
+
+   approx = ( f(1:n-2) - 2*f(2:n-1) + f(3:n) ) / (h^2) ;
+
+// we compare "approx" with the exact derivative;
+
+   exact = -(4*x/sqrt(%pi)) .* exp(-x.^2) ;
+
+   plot(x(2:(n-1)),approx,'o' , x,exact,'r' , title="Approximation of erf'(x) by centered FD",16)
+
+   disp('<< End derivative >>')

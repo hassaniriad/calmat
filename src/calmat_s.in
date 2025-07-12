@@ -1,0 +1,37 @@
+args=$@
+
+newfunc=-1
+
+until [ $# = 0 ]
+do
+   if [ "$1" == "-i" ]
+   then
+      shift
+      file=$1
+      echo "-1" > addfun.out
+      echo "Execute addfun (it reads the file $file, and if needed writes and" 
+      echo "compiles .tmp_$file.f90 and remakes libpk2.a)"
+      $pk2bin/addfun -i $file -o .tmp_$file -l static -d -onlysub > .tmp_stdout_addfun
+      newfunc=$(cat addfun.out)
+      if [ $newfunc -gt 0 ]
+      then
+         $comp $flags -I $pk2mod $calmatobj/*.o .tmp_$file.a -llapack -lblas -o .tmp_calmat.exe  2> .tmp_calmat.out
+      elif [ $newfunc -lt 0 ]
+      then
+         /bin/rm -f addfun.out  .tmp_stdout_addfun
+         /bin/rm -f .tmp_$file.a  .tmp_$file.o 
+         exit
+      fi
+   fi
+   shift
+done
+
+if [ $newfunc -gt 0 ] 
+then
+   ./.tmp_calmat.exe $args
+else
+   $calmatbin/calmat_s.exe $args
+fi 
+
+/bin/rm -f  .tmp_$file.a  .tmp_$file.f90 .tmp_calmat.o  .tmp_calmat.exe .tmp_stdout_addfun
+/bin/rm -f  addfun.out  userfunc_m.mod  .tmp_calmat.out

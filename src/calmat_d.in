@@ -1,0 +1,34 @@
+args=$@
+export DYLD_LIBRARY_PATH=$pk2lib
+
+newfunc=-1
+
+until [ $# = 0 ]
+do
+   if [ "$1" == "-i" ]
+   then
+      shift
+      file=$1
+      echo "-1" > addfun.out
+      echo "Execute addfun (it reads the file $file, and if needed writes and" 
+      echo "compiles .tmp_$file.f90 and remakes libpk2_d.so)"
+      $pk2bin/addfun -i $file -o .tmp_$file -l dynamic -d -onlysub > .tmp_stdout_addfun
+      newfunc=$(cat addfun.out)
+      if [ $newfunc -gt 0 ]
+      then
+         /bin/mv -f .tmp_$file.so libpk2_d.so
+         export DYLD_LIBRARY_PATH=.:$pk2lib
+      elif [ $newfunc -lt 0 ]
+      then
+         /bin/rm -f  addfun.out  .tmp_$file.so  .tmp_$file.o 
+         /bin/rm -f .tmp_stdout_addfun
+         exit
+      fi
+   fi
+   shift
+done
+
+$calmatbin/calmat_d.exe $args
+
+/bin/rm -f libpk2_d.so .tmp_$file.f90 .tmp_$file.o  addfun.out  userfunc_m.mod 
+/bin/rm -f .tmp_stdout_addfun

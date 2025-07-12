@@ -1,0 +1,11 @@
+
+// intentional error (overlapping for/if). Will be detected during the read
+for i=1:5
+    if i > 3 then
+       e = 0
+    endfor
+endif
+
+// the rest of the script will not be read:
+list
+a=3*i+1

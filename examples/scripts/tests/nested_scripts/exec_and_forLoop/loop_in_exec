@@ -1,0 +1,5 @@
+clear
+n = 10
+a = 0
+exec('loop_in_exec1')
+disp(a,'a in the main: ')

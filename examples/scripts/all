@@ -1,0 +1,16 @@
+exec "basic1";
+exec "basic2"
+exec "basic3"
+exec "derivative"
+exec 'eigenvalues'
+exec 'exec'
+exec "heat"
+exec "helmholtz2d"
+exec "laplacian1d"
+exec "laplacian2d"
+exec 'newton1'
+exec 'newton2'
+exec 'readwrite'
+
+
+

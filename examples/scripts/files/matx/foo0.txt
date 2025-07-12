@@ -1,0 +1,10 @@
+ # This is an example of a file containing the definition of an array using the [ ]
+ # The default symbol for comment (#) is used
+ # The calmat command for reading this file is then simply
+ #          A = readmat("foo0.txt")
+ # or 
+ #          A = readmat(file = "foo0.txt")
+ #
+[ 1, 2, 3, 4.1 ; ... 
+  5, 6, 7, 8   ; ... 
+  9, -1, 0, 0 ] 

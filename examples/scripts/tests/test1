@@ -1,0 +1,4 @@
+//clear
+i=3
+u(i)=i
+clear

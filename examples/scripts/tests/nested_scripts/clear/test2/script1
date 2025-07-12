@@ -1,0 +1,6 @@
+clear
+a1 = 1
+b1 = 2
+disp(a1+b1)
+
+

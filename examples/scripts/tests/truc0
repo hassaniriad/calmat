@@ -1,0 +1,4 @@
+file = 'truc'  
+c= 0
+exec('truc')
+d = 22 + c

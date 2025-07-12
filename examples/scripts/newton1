@@ -1,0 +1,82 @@
+// Example using calmat -- Usage of for-loop and if-test constructs
+//
+// Find the root (tau) of 
+//
+//      (rho*w)/tau = cosh(rho*d/(2*tau)) - 1
+//
+// by the Newton method
+
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//         exec('newton1')    or   exec 'newton1'
+//
+//   (or manually copy/paste the lines of the file newton1)
+//
+//  -in batch mode using the command line argument of calmat: 
+//   in a terminal window, type
+//
+//              calmat -i newton1 -o out
+//   or 
+//              calmat -i newton1
+//
+//   (in the first case outputs are written into "out" while for the
+//    second case outputs are written into "newton1.out")
+//
+
+disp(' ')
+disp('<< Start newton1 >>')
+clear
+
+disp(...
+     "Find 'tau' satisfying the equation \n"+...
+     "     a/tau = cosh(b/tau) - 1  \n"+...
+     "where a = 1 and b = 15. \n\n" + ...
+     "This non-linear equation is transformed to \n"+...
+     "     f(x) = cosh(b*x) - a*x - 1 = 0 \n"+...
+     "and solved for 'x' with the Newton's Method starting from x = 1.\n")
+
+
+rho = 1 ; d = 30 ; w = 1 ; a = rho*w ; b = rho*d/2 ;
+
+nmax = 30 ; eps = 1e-8 ; iconv = 0 ;
+
+x = 1 ; // first estimate
+
+for k = 1:nmax
+
+    f  = cosh(b*x) - a*x - 1 ; // the function
+    fp = b*sinh(b*x) - a     ; // and its derivative
+
+    dx =-f/fp   ; // the correction
+    x  = x + dx ; // the new estimate
+
+    // Print |dx| and |f| (residual):
+
+    s = 'k = '+num2str(k) + ': |dx| = ' + num2str(abs(dx)) + ...
+        ', |f| = '+num2str(abs(f)) ;
+    disp(s)
+
+    // Check the convergence:
+
+    if abs(dx) < eps*abs(x) then
+       iconv = k ;
+       break
+    endif
+
+endfor
+
+//if (iconv == 0) then
+ //  disp('Warning: not converged in nmax = ' + num2str(nmax) + ' iterations.')
+ //  disp(1/x,'Last estimation of tau (= 1/x) is ')
+//else
+   msg = 'Converged in ' + num2str(iconv) + ' iterations.';
+   disp('Converged in ' + num2str(iconv) + ' iterations.')
+   disp(1/x,'The estimated value of tau (= 1/x) is ')
+//endif
+
+disp("\n")
+
+disp('<< End newton1 >>')

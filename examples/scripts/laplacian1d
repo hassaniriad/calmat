@@ -1,0 +1,71 @@
+// Example using calmat to solve the 1d Poisson problem 
+//
+//    -u''(x) = f(x)    a < x < b
+//    u(a) = ua  & u(b) = ub
+//
+//    by finite differences method
+//
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec 'laplacian1d'
+//
+//  -in batch mode: in a terminal window, type
+//
+//              calmat -i laplacian1d -o out
+
+   disp(' ')
+   disp('<< Start laplacian1d >>')
+   clear
+
+   disp(...
+        "Solve \n"+...
+        "     | -u'' = f in Omega = (0,1)  \n"+...
+        "     |  u   = g on dOmega \n"+...
+        "with the Finite Differences Method")
+
+// Data (example with f(x) = (2*%pi)^2 * cos(2*%pi*x) and a=0, b=1, ua=ub=0):
+
+   a = 0 ; b = 1 ; ua = 0 ; ub = 0 ;
+
+// Number of nodes, step size and nodes coordinates:
+
+   n = 51; h = (b-a) / (n-1) ; x = (a : h : b)' ;
+
+// Set the matrix M and the rhs (B = h^2 * f(x)) : 
+
+   M = 2*diag(ones(n,1)) - diag(ones(n-1,1),-1) - diag(ones(n-1,1),1) ;
+   B = (2*%pi)^2 * sin(2*%pi*x) * h^2 ;
+
+// Insert the boundary conditions:
+
+   M(1,:) = 0 ; M(1,1) = 1 ; B(1) = 0;
+   M(n,:) = 0 ; M(n,n) = 1 ; B(n) = 0;
+
+// Solve the system M*U = B:
+
+   t1 = cputime(); disp('Solving the system -- Start')
+
+   U = M \ B;
+
+   disp(cputime()-t1,'Solving the system -- End. Total cpu time: ')
+
+
+// Plot the numerical solution and compare to the exact one 
+
+   disp('Plotting (call to gnuplot)')
+
+   plot (x,U,'+' , x, sin(2*%pi*x),'-r' , ...
+        title = "Solution of -u''(x) = (2 pi)^2 cos(2 pi x)  with u(0) = u(1) = 0",14) 
+
+// (Note: in batch mode, the plot is saved in png file
+//  named after the name of the script: laplacian1d.txt_fig1.png)
+
+// Print the norm of the error:
+
+   disp(norm(U - sin(2*%pi*x)),'|| U - Uex || = ')
+
+   disp('<< End laplacian1d >>')
+

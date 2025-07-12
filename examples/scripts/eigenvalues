@@ -1,0 +1,58 @@
+// Example using calmat to compute eigenvalues and eigenvectors
+//
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec 'eigenvalues'
+//
+//  -in batch mode: in a terminal window, type
+//
+//              calmat -i eigenvalues -o out -b
+
+   disp(' ')
+   disp('<< Start eigenvalues >>')
+   clear
+
+// Let A be a real random matrix and B a complex one:
+
+   n = 10; 
+   A = rand(n,n) ;
+   B = rand(n,n) + %i * rand(n,n);
+
+// If we want to compute only the eigenvalues:
+
+   dA = eig(A) ; dB = eig(B) ; 
+
+// Plot the eigenvalues in the complex plane:
+// (necessarily complex conjugate pairs for the real matrix A)
+
+   plot (real(dA), imag(dA),"sb" , ...  // use blue squares for A
+         real(dB), imag(dB),'sr')       // use red squares for B
+
+// (Note: in batch mode, the plot is saved in a png file                                                              
+// named after the name of the script: eigenvalues.txt_fig1.png)
+
+// Now, if we want also the eigenvectors of A:
+
+   [d,P] = eig(A) ; // the 1st output is always the vector of eigenvalues
+                    // (unlike Matlab/Scilab convention)
+// Verifiy:
+
+   tol = "1e-8";
+   
+   if norm(inv(P)*A*P-diag(d))/norm(d) < str2num(tol) then
+      rep = 'yes';
+   else
+      rep = 'no';
+   end  if
+   
+   disp ("Verification: Is ||P^-1 * A * P - D|| / || D || < "+tol+" ? Answer: "+rep)
+   
+// Some outputs:
+
+   disp(max(abs(d)), 'The eigenvalue of A which has the max. modulus is: ')
+   disp(min(abs(d)), "The eigenvalue of A which has the min. modulus is: ")
+
+   disp('<< End eigenvalues >>')

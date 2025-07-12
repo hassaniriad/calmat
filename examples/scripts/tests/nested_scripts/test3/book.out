@@ -1,0 +1,158 @@
+
+*** This is a test with a number of nested scripts inclusions    ***
+
+***                                                              ***
+
+*** The script 'book' executes                                   ***
+
+*** - the instructions of the script 'prologue'                  ***
+
+*** - some instructions                                          ***
+
+*** - the script 'sections_of_chapter_II' which executes some    ***
+
+***   instructions and the script 'subsections_of_section_II.2'  ***
+
+*** - some instructions                                          ***
+
+*** - the instructions of the script 'epilogue'                  ***
+
+***                                                              ***
+
+*** Here are the instructions of the script 'book':              ***
+
+***                                                              ***
+
+***      exec prologue                                           ***
+
+***      . Introduction                                          ***
+
+***      . Chapter I                                             ***
+
+***      . Chapter II                                            ***
+
+***      exec sections_of_chapter_II                             ***
+
+***      . Chapter III                                           ***
+
+***      . Chapter IV                                            ***
+
+***      exec epilogue                                           ***
+
+***      The End                                                 ***
+
+***                                                              ***
+
+*** and those of the script 'sections_of_chapter_II':            ***
+
+***                                                              ***
+
+***     ... Section II.1                                         ***
+
+***     ... Section II.2                                         ***
+
+***         exec subsections_of_section_II.2                     ***
+
+***     ... Section II.3                                         ***
+
+***     ... Section II.4                                         ***
+
+***     ... Section II.5                                         ***
+
+***                                                              ***
+
+*** and finaly those of 'subsections_of_section_II.2':           ***
+
+***                                                              ***
+
+***     ..... Subsection II.2-a                                  ***
+
+***     ..... Subsection II.2-b                                  ***
+
+***     ..... Subsection II.2-c                                  ***
+
+***     ..... Subsection II.2-d                                  ***
+
+***                                                              ***
+
+*** The result should look like the table of contents  of book:  ***
+
+***                                                              ***
+
+***   (this message)       < (in prologue)                       ***
+
+***   . Introduction  < (in book)                                ***
+
+***   . Chapter I     < (in book)                                ***
+
+***   . Chapter II    < (in book)                                ***
+
+***   ... Section II.1     < (in sections_of_chapter_II)         ***
+
+***   ... Section II.2     < (in sections_of_chapter_II)         ***
+
+***   ..... Subsection II.2-a < (in subsections_of_section_II.2) ***
+
+***   ..... Subsection II.2-b < (in subsections_of_section_II.2) ***
+
+***   ..... Subsection II.2-c < (in subsections_of_section_II.2) ***
+
+***   ..... Subsection II.2-d < (in subsections_of_section_II.2) ***
+
+***   ... Section II.3     < (in sections_of_chapter_II)         ***
+
+***   ... Section II.4     < (in sections_of_chapter_II)         ***
+
+***   ... Section II.5     < (in sections_of_chapter_II)         ***
+
+***   . Chapter III   < (in book)                                ***
+
+***   . Chapter IV    < (in book)                                ***
+
+***   (epilogue message)   < (in epilogue)                       ***
+
+***   The End         < (in book)                                ***
+
+********************************************************************
+
+. Introduction
+
+. Chapter I
+
+. Chapter II
+
+... Section II.1
+
+... Section II.2
+
+..... Subsection II.2-a
+
+..... Subsection II.2-b
+
+..... Subsection II.2-c
+
+......... c1) hello
+
+......... c2) how are you
+
+......... c3) bye
+
+..... Subsection II.2-d
+
+... Section II.3
+
+... Section II.4
+
+... Section II.5
+
+. Chapter III
+
+. Chapter IV
+
+***********************************
+
+*** The test is now terminated. ***
+
+***********************************
+
+The End

@@ -1,0 +1,108 @@
+// Example using calmat to solve the 2d Poisson problem 
+//
+//    find u: Omega --> R, s.t.
+//    -laplacian(u) = f    in Omega = ]a,b[^2
+//     u            = g    on dOmega
+//
+//    by finite differences method
+//
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec 'laplacian2d'
+//
+//  -in batch mode: in a terminal window, type
+//
+//              calmat -i laplacian2d -o out
+
+   disp(' ')
+   disp('<< Start laplacian2d >>')
+   clear
+
+   disp(...
+        'Solve \n'                                             + &
+        '     | find u: Omega --> R, s.t. \n'                  + &
+        '     | -laplacian(u) = f in Omega = (0,1) x (0,1) \n' + &
+        '     |  u            = g on dOmega \n'                + ...
+        'with the Finite Differences Method')
+
+////////////////////////////////////////////////////////////////////////////
+//               First example with f = 1 and g = 0
+////////////////////////////////////////////////////////////////////////////
+
+   disp('***** First example (f = 1 & g = 0)')
+
+   a = 0 , b = 1 , f = 1 , g = 0 ,
+
+// Number of nodes, mesh size and nodes coordinates:
+
+   n = 51 ; N = n^2 ; h = (b - a) / (n - 1) ; // uniforme mesh
+
+   XY = meshgrid ((a:h:b)',(a:h:b)') ; // node coordinates
+
+// Set the matrix K and the rhs (F = h^2 * f(x)) : 
+
+   sz = '(of size ' + num2str(N) + ' x ' + num2str(N) + ')' ;
+   disp('Setting the matrix and the rhs of the system ' + sz)
+
+   K = 4*diag(ones(N,1)) - diag(ones(N-1,1),-1) - diag(ones(N-1,1),1) ...
+                         - diag(ones(N-n,1),-n) - diag(ones(N-n,1),n) ;
+
+   F = h^2 * f * ones(N,1) ;
+
+// Insert the boundary conditions:
+
+   // boundary node #s: 
+   i = [   1:n    , 2*n:n:N     , N-n+1:N-1 , n+1:n:N-2*n+1] ; 
+   //   botom side, right side  , top side  , left side
+    
+  // Modify F and K:
+   F(i) = g ; K(i,:) = 0 ; nbc = length(i) ; K(i,i) = eye(nbc,nbc) ;
+
+// Solve the system K*U = F:
+   
+   disp('Solving the system -- Start') ; t1 = cputime();
+   U = K \ F;
+   disp(cputime()-t1,'Solving the system -- End. Total cpu time: ')
+
+// Plot the numerical solution 
+
+   disp('Plotting (call to gnuplot)')
+   plot3d(XY(:,1),XY(:,2),U,'x' , title = "Solution with f = 1 and g = 0",14)
+
+/////////////////////////////////////////////////////////////////////////////////////
+// Second example with f = (A^2 + B^2)*sin(A*x)*cos(B*y) and g = sin(A*x)*cos(B*y) 
+// (the exact solution is then u = sin(A*x)*cos(B*y))
+/////////////////////////////////////////////////////////////////////////////////////
+
+   disp('***** Second example (f=(2*A^2)*sin(A*x)*cos(A*y) & g=sin(A*x)*cos(A*y), A=2PI)')
+
+   x = XY(:,1) ; y = XY(:,2) ;
+
+// Set the rhs (F = h^2 * f(x)) : 
+
+   A = 2*%pi ; B = A ;
+   F = h^2 * (A^2 + B^2) * sin(A*x) .* cos(B*y) ;
+
+// Insert the boundary conditions:
+
+   // boundary node #s: 
+   i = [1:n , 2*n:n:N , N-n+1:N-1 , n+1:n:N-2*n+1] ; nbc = length(i) ; 
+   
+   // Modify F:   
+   F(i) = sin(A*x(i)) .* cos(B*y(i)) ;
+
+// Solve the system K*U = F:
+
+   disp('Solving the system -- Start') ; t1 = cputime();
+   U = K \ F;
+   disp(cputime()-t1,'Solving the system -- End. Total cpu time: ')
+
+// Plot the numerical solution and the exact solution: 
+
+   disp('Plotting (call to gnuplot)')
+   surf(x,y,U , x,y,sin(A*x).*cos(B*y),':', title = "Solution with f = (A^2 + B^2) sin(Ax) cos(By) and g = sin(Ax) cos(By)",14)
+
+   disp('<< End laplacian2d >>')

@@ -1,0 +1,9 @@
+disp('hello from script3')
+
+a3 = 'a in script3'
+
+exec dir+"script4"
+
+b3 = 'b in script3')
+
+disp('leave script3')

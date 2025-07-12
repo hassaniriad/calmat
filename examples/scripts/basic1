@@ -1,0 +1,87 @@
+// Example using calmat -- Basics operations
+//
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec 'basic1'
+//
+//   (or manually copy/paste the lines of the file basic1)
+//
+//  -in batch mode: in a terminal window, type
+//
+//              calmat -i basic1 -o out 
+
+   disp(' ')
+   disp('<< Start basic1 >>')
+
+   clear
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 1) Defining scalars (1x1 arrays)
+////////////////////////////////////////////////////////////////////////////////////////
+
+   n = 10 ;           // an integer scalar
+   a = 1.234 ;        // a real scalar 
+   z = a + %i*2.468;  // a complex scalar
+   l = %f ;           // a boolean scalar
+   s = 'hello world'; // a sring scalar
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 2) Defining arrays
+////////////////////////////////////////////////////////////////////////////////////////
+   
+   A = [1,2,3 ; 4,5,6]             // an integer array (2x3)
+   B = [11.0, 12, 13, 14, 15, 16]  // a real array (1x6)
+   C = [98*%i ; 99]                // a complex array (2x1)
+
+   M = [A,C,C,C; B]               // Assembling arrays (complex 3x6)
+  
+   M = M + 20 // Add 20 to each element of M
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 3) Using ":"
+////////////////////////////////////////////////////////////////////////////////////////
+
+// 3.1) 
+
+   x = 1:20 ;          // default step is 1 (integer array)
+   x = 1:2:20 ;        // with step = 2 (integer array)
+   x = 0 : 0.1: 2*%pi  // (real array)
+
+// 3.2) be careful when using algebra:  
+
+   x1 = 1 ; x2 = 20 ; step = 1 ; 
+
+   x = x1 : step : x2 
+
+   x = 1 + x1 : step : x2 + 2 // is interpreted as x = (1 + x1) : step : (x2 + 2) 
+                              // i.e. as x = 2:1:22
+
+   //x = x1:x2 + x2:-step:x1   // --> ERROR (use parentheses or square brackets):
+
+   x = (x1:x2) + (x2:-step:x1) // --> correct
+   x = [x1:x2] + [x2:-step:x1] // --> correct
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 4) Extracting values (using ":") 
+////////////////////////////////////////////////////////////////////////////////////////
+   
+// Let M be the integer matrix:
+   M = [1:6 ; 2*(1:6) ; 3*(1:6)] ;
+
+// Then
+   m = M(:,1) ;        // the 1st column of M (equivalent to M(1:3,1))
+   m = M(2,:) ;        // the 2nd row of M (equivalent to M(2,1:6))
+   m = M(2:3,4:6) ;    // the submatrix 2<=i<=3, 4<=j<=6
+   m = M(2:3,[3,6,1]); // the submatrix 2<=i<=3, j in [3,6,1]
+
+////////////////////////////////////////////////////////////////////////////////////////
+// 5) Changing values (using ":") 
+////////////////////////////////////////////////////////////////////////////////////////
+
+   M(:,1) = 1 ;      // reset all elements of the 1st columns to 1
+   M(2:3,[3,6]) =-1; // reset the submatrix 2<=i<=3, j in [3,6] to -1
+
+   disp('<< End basic1 >>')

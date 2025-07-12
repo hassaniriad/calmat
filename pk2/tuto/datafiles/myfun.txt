@@ -1,0 +1,56 @@
+
+fortranproc hello ()
+   print*, 'hello world!'
+endfortranproc hello
+
+
+fortranproc [ regular, x, detA, invA ] = solve3x3 ( A, b )
+   real    :: A(3,3), b(3), x(3), invA(3,3), detA
+   logical :: regular
+!----------------------------------------------------------------------------------- 
+! Solves the 3x3 linear system A*x = b using 3 cross products and 1 dot product
+! Returns regular = .false. if the matrix is singular
+! Computes also (if A is not singular) the inverse matrix
+! If A is singular prints a warning and returns with x = 0
+!----------------------------------------------------------------------------------- 
+
+!- local variables -----------------------------------------------------------------
+   real, parameter :: TINY = 1e-20 ! test
+!----------------------------------------------------------------------------------- 
+   regular = .true.
+   invA(:,1) = cross ( A(2,:), A(3,:) )
+   detA = dot ( invA(:,1), A(1,:) )
+   if ( abs(detA) < TINY ) then
+      regular = .false.
+      x = 0.0
+      opflag = err_t(stat=WARNING,where='solve3x3b',msg=&
+                    'could not solve the system, the matrix is singular or near singular')
+      return
+   end if
+   invA(:,1) = invA(:,1) / detA
+   invA(:,2) = cross ( A(3,:), A(1,:) ) / detA
+   invA(:,3) = cross ( A(1,:), A(2,:) ) / detA
+   x = b(1)*invA(:,1) + b(2)*invA(:,2) + b(3)*invA(:,3)
+   
+   contains 
+!
+!-   internal functions of solve3x3:
+!
+     function cross ( x, y ) result(z)
+       real, intent(in) :: x(3), y(3)
+       real             :: z(3)
+       z(1) = x(2)*y(3) - x(3)*y(2)
+       z(2) =-x(1)*y(3) + x(3)*y(1)
+       z(3) = x(1)*y(2) - x(2)*y(1)
+     end function cross
+
+     function dot ( x, y ) result(s)
+       real, intent(in) :: x(3), y(3)
+       real,            :: s
+       s = x(1)*y(1) + x(2)*y(2) + x(3)*y(3)
+     end function dot
+endfortranproc solve3x3
+
+
+
+

@@ -1,0 +1,111 @@
+// Example using calmat -- Basics operations
+//                         Usage of some functions 
+//                         (you can see the list of functions by list 'fun')
+//
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec 'basic2'
+//
+//   (or manually copy/paste the lines of the file basic2)
+//
+//  -in batch mode: in a terminal window, type
+//
+//              calmat -i basic2 -o out -b
+
+   disp(' ')
+   disp('<< Start basic2 >>')
+   clear
+
+// Let M be the integer matrix:
+   M = [1:6 ; 2*(1:6) ; 3*(1:6)] 
+
+// and N and P be the real matrices:
+   N = rand(6,2);  // a 6x2 random matrix
+   P = rand(M) ;   // a random matrix of same shape of M 
+
+   MN = M * N  // matrix multiplication
+   MP = M .* P // element-wise multiplication
+   MP = M ./ P // element-wise divide
+
+   disp(size(MN), 'size(MN) = ')
+   disp(size(MP), 'size(MP) = ')
+   disp(numel(MP), 'numel(MP) = ')
+
+////////////////////////////////////////////////////////////////////////////
+// Transpose and conjugate transpose
+////////////////////////////////////////////////////////////////////////////
+
+   Z = [1,2,3;4,5,6;7,8,9;10,11,12] ;
+   Z = Z * (1+%i)    
+
+   Z'  // same as trans(Z) -- conj. transpose of Z
+   Z.' // same as transp(Z) -- transpose of Z
+
+////////////////////////////////////////////////////////////////////////////   
+// Find the position of elements that satisfy a given condition:    
+////////////////////////////////////////////////////////////////////////////
+
+   M = M*1.0
+   indx = find(M < 10 & M >= 3);
+   a = M(indx);  // or direclty: a = M(find(M < 10 & M >= 3))
+   disp ( a' , "Elements of M that are >=3 and < 10 are the following: ")
+   disp ( indx' , "and their corresponding (major-column) indices are: ")
+
+////////////////////////////////////////////////////////////////////////////
+// Reshape an array:
+////////////////////////////////////////////////////////////////////////////
+
+   R = reshape(M,[9,2])
+
+////////////////////////////////////////////////////////////////////////////
+// Get the diagonal of an array:
+////////////////////////////////////////////////////////////////////////////
+
+   d = diag(M) ; disp(d,'d = diag(M) = ')   // the main diagonal (same as diag(M,0)
+   d = diag(M,5) ; disp(d,'d = diag(M,5) = ') // the 5-th upper-diagonal
+   d = diag(M,-1) ; disp(d,'d = diag(M,-1) = ')// the 1st lower-diagonal  
+
+////////////////////////////////////////////////////////////////////////////
+// Set the diagonal of an array:
+////////////////////////////////////////////////////////////////////////////
+
+   n = 6
+   d = 1:n
+   D = diag(d) ;  // put d on the main diagonal of D (same as diag(d,0))
+   d = ones(n-1,1)
+   D = D + diag(d,-1) // put d on the 1st lower-diagonale of D
+   d = 2*ones(n-2,1)
+   D = D + diag(d,-2) // put d on the 2nd lower-diagonale of D
+   d = 99*ones(n-4,1)
+   D = D + diag(d,4) // put d on the 4-th upper-diagonale of D
+
+////////////////////////////////////////////////////////////////////////////
+// Get the upper(resp. lower)-triangle of an array:
+////////////////////////////////////////////////////////////////////////////
+ 
+   U = triu(D) // same as triu(D,1)
+   L = tril(D) // same as tril(D,1)
+   L = tril(D,-2)
+
+/////////////////////////////////////////////////////////////////////////////////
+// Compute the trace, the determinant, the deviator  and the inverse of a matrix:
+/////////////////////////////////////////////////////////////////////////////////
+
+   trD  = trace(D)
+   DetD = det(D)
+   devD = dev(D)
+   Dinv = inv(D)
+
+////////////////////////////////////////////////////////////////////////////
+// Solve a linear system
+////////////////////////////////////////////////////////////////////////////
+
+   x = (1:n)'; b = D*x ;
+   x1 = inv(D) * b 
+   x2 = D \ b 
+   disp(norm(x1-x2), '|| x1 - x2 || = ')
+
+   disp('<< End basic2 >>')

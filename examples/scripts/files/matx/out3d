@@ -1,0 +1,6 @@
+// Male (true/false)  First Name
+// size (nrow,ncol): 4 2
+            .t.         'John'
+            .f.         'Emma'
+            .f.    'Elizabeth'
+            .t.      'Patrick'

@@ -1,0 +1,7 @@
+# A file containing column data of various numeric type
+#
+# Col1(integers)  Col2(reals)  Col3(integers)  Col4(complexes)  
+   1                1.0             10             (1,1)
+   2                2.0e0            9             (2,2d0)
+   3               -3.0d11           8             (-3.,+3)
+   4                4.0001           7             (4.01,3.14e0)

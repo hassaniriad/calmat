@@ -1,0 +1,6 @@
+clear
+a = 'hello'
+disp("Intentional error (y = sin('hello')):")
+y = sin(a)  // an error message will be printed and the rest will not be processed  
+d = a + ' world!'
+

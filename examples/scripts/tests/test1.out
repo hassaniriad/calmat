@@ -1,0 +1,9 @@
+(calmat) ~> i=3
+(calmat) ~> u(i)=i
+(calmat) ~> clear
+
+i = 3
+
+u = 0
+    0
+    3

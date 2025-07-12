@@ -1,0 +1,5 @@
+# A file containing column data of various type
+# integers  reals  integers integers  strings  logicals  complexes
+  1         2e1     3       4         'a'      .true.    (1,1)  
+  5         6e2     7       8         'b'      .true.    (2.0,3) 
+  9        -1e3     0       0         'c'      .false.   (3.0,-4.0)

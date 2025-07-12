@@ -1,0 +1,13 @@
+// This is an example of a file containing the definition of an array using the [ ]
+// In this file the symbols "//" are used for comments
+// So the calmat command to read this file is:
+//    A = readmat(file='foo1.txt',comment='//')
+// Blank lines may be added
+//
+ 
+[ 1, 2, 3, 4.1 ; ... // The 1st row ("..." is used here as a break line)
+  5, 6, 7, 8   ; ... // The 2d row
+  9, -1, 0, 0 ]      // The last row
+
+// Of course we also may write it on a single line: 
+// [1, 2, 3, 4.1 ; 5, 6, 7, 8 ; 9, -1, 0, 0 ]

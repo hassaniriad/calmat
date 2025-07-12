@@ -1,0 +1,94 @@
+// Example using calmat to solve the complex 2d Helmholtz problem 
+//
+//    find u: Omega --> R, s.t.
+//    -laplacian(u) + k^2*u = f    in Omega = ]0,1[^2
+//     grad(u).n + i*a*k*u  = 0    on dOmega
+//
+//    by the finite differences method
+//
+
+// This script can be used in two ways: 
+//
+// - in interactive mode: after launching calmat, type
+//
+//                 exec 'helmholtz2d'
+//
+//  -in batch mode: in a terminal window, type
+//
+//              calmat -i helmholtz2d -o out -b
+
+   disp(' ')
+   disp('<< Start helmholtz2d >>')
+   clear
+
+   disp(                                                               ...
+        'Solve                                                     \n'+...
+        '     | find u: Omega --> R, s.t.                          \n'+...
+        '     | -laplacian(u) - k^2*u = f in Omega = (0,1) x (0,1) \n'+...
+        '     |  grad(u).n + %i*a*k*u = 0 on dOmega                \n'+...
+        'with the Finite Differences Method')
+
+
+   x1 = 0 ; x2 = 1 ;  k = 10 ; a = 1e3;
+
+// Number of nodes, mesh size and nodes coordinates:
+
+   n = 51 ; N = n^2 ; h = (x2 - x1) / (n - 1) ; // uniform mesh
+
+   XY = meshgrid ((x1:h:x2)',(x1:h:x2)') ; // node coordinates
+
+// Set the matrix K and the rhs (F = h^2 * f(x)) : 
+
+   sz = '(of size ' + num2str(N) + ' x ' + num2str(N) + ')' ; 
+   disp('Setting the matrix and the rhs of the system ' + sz)
+
+   Gamma = 4 - (h*k)^2 ;
+   K = Gamma*diag(ones(N,1)) - diag(ones(N-1,1),-1) - diag(ones(N-1,1),1) ...
+                             - diag(ones(N-n,1),-n) - diag(ones(N-n,1),n) ;
+
+   F =-h^2 * ( (XY(:,1)-0.5).^2 + (XY(:,2)-0.5).^2 )  ;
+
+// Insert the boundary conditions:
+
+  // Modify K:
+
+  Beta = 1 + %i * h*k*a;
+
+  // on bottom side:
+  i = 1:n      ; K(i,:) = 0 ; K(i,i) = Beta*eye(n,n) ; K(i,i+n)=-diag(ones(n,1)) ;
+  // on top side:
+  i = N-n+1:N  ; K(i,:) = 0 ; K(i,i) = Beta*eye(n,n) ; K(i,i-n)=-diag(ones(n,1)) ;
+  // on left side:
+  i = 1:n:N-n+1; K(i,:) = 0 ; K(i,i) = Beta*eye(n,n) ; K(i,i+1)=-diag(ones(n,1)) ;
+  // on right side:
+  i = n:n:N    ; K(i,:) = 0 ; K(i,i) = Beta*eye(n,n) ; K(i,i-1)=-diag(ones(n,1)) ;
+
+  Beta = 2 + %i * sqrt(2) * h*k*a;
+
+  // at bottom-left corner (normal = [-1,-1]/sqrt(2)):
+  i = 1     ; K(i,:) = 0 ; K(i,i) = Beta ; K(i,i+1) =-1 ; K(i,i+n) =-1 ;
+  // at bottom-right corner (normal = [1,-1]/sqrt(2)):
+  i = n     ; K(i,:) = 0 ; K(i,i) = Beta ; K(i,i-1) =-1 ; K(i,i+n) =-1 ;
+  // at top-left corner (normal = [-1,1]/sqrt(2)) :
+  i = N-n+1 ; K(i,:) = 0 ; K(i,i) = Beta ; K(i,i+1) =-1 ; K(i,i-n) =-1 ;
+  // at top-right corner (normal = [1,1]/sqrt(2)) :
+  i = N     ; K(i,:) = 0 ; K(i,i) = Beta ; K(i,i-1) =-1 ; K(i,i-n) =-1 ;
+
+// Solve the complex linear system K*U = F:
+   
+   disp('Solving the system -- Start') ; t1 = cputime();
+   U = K \ F;
+   disp(cputime()-t1,'Solving the system -- End. Total cpu time: ')
+
+// Plot the numerical solution:
+
+   disp('Plotting (call to gnuplot)')
+   surf(XY(:,1),XY(:,2),real(U) , title='Real part of the solution',16) ;
+   surf(XY(:,1),XY(:,2),imag(U) , title='Imaginary part of the solution',16)
+
+// Write the solution in a file:
+
+   disp("Writting the file 'helmholtz.out'")
+   writemat(file='helmholtz.out',mat=[XY,real(U),imag(U)])
+
+   disp('<< End helmholtz2d >>')

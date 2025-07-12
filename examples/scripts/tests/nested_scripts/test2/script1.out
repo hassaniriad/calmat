@@ -1,0 +1,50 @@
+
+hello from script1
+
+dir = /Users/hassaniriad/1-Codes/pk2_jul20/app/calmat/examples/scripts/tests/nested_scripts/test2/
+
+a1 = a in script1
+
+hello from script2
+
+a2 = a in script2
+
+hello from script3
+
+a3 = a in script3
+
+hello from script4
+
+a4 = a in script4
+
+hello from script5
+
+a5 = a in script5
+
+b5 = b in script5
+
+leave script5
+
+b4 = b in script4
+
+leave script4
+
+b3 = b in script3
+
+leave script3
+
+b2 = b in script2
+
+leave script2
+
+b1 = b in script1
+
+***********************************
+
+*** The test is now terminated. ***
+
+***********************************
+
+leave script1
+
+bye

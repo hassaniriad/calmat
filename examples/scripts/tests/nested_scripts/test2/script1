@@ -1,0 +1,13 @@
+disp('hello from script1')
+dir = pwd()  + '/'   
+
+a1 = 'a in script1'
+
+exec dir+"script2"
+
+b1 = 'b in script1'
+
+f = "epilogue" ; exec(dir+f);
+
+disp('leave script1')
+disp("bye")

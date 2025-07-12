@@ -1,0 +1,16 @@
+
+c=0               // 1
+f = "exec2"
+i=1               // 2
+    disp(i)       // 3
+    exec(f)  // 4
+i=2               // 5
+    disp(i)       // 6
+    exec 'exec2'  // 7
+i=3               // 8
+    disp(i)       // 9
+    exec 'exec2'  // 10
+
+disp(c)           // 11
+
+
