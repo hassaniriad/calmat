@@ -1437,7 +1437,7 @@ CONTAINS
    write(ud,'(/,a,/)')'// messages: display welcome message (yes/no) and ' // &
                     'content of the farewell message:'
 
-   write(ud,'(a)') '   set(message.welcome , "yes") ; '
+   write(ud,'(a)') '   set(message.welcome , "no") ; '
    write(ud,'(a)') '   set(message.farewell, "'// G_farewell // '") ;'
 
    write(ud,'(/,a,/)')'// gnuplot: path of gnuplot (if not in your $PATH), '// &
