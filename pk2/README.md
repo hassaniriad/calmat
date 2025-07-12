@@ -1031,7 +1031,7 @@ git  clone  https://github.com/hassaniriad/calmat.git
 	
 	(please note that several compiler bugs have been corrected, be sure you have the last release).
 
-	I haven't tried compiling it on Windows, but if you do, I'd be very interested to know.
+	I haven't tried compiling it on Windows and on macOS ARM, but if you do, I'd be very interested to know.
 
 The makefile in the main `calmat` directory (`calmat/Makefile`) simply executes the makefile of the `pk2` library (located in `calmat/pk2/src` directory) and then runs the makefile of calmat (located in `calmat/src` directory).  
 

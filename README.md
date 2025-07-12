@@ -63,7 +63,7 @@ It contains a copy of the pk2 project.
 	
 	(please note that several compiler bugs have been corrected, be sure you have the last release).
 
-	I haven't tried compiling it on Windows, but if you do, I'd be very interested to know.
+	I haven't tried compiling it on Windows and on macOS ARM, but if you do, I'd be very interested to know.
 
 The makefile in the main `calmat` directory first runs the makefile of the `pk2` library (located in `calmat/pk2/src` directory) and then the makefile of calmat (located in `calmat/src` directory). These makefiles are ready to use for ifort, ifx, gfortran and nagfor (you can easily adapt them to another compiler).
 
