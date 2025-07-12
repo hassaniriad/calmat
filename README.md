@@ -51,7 +51,7 @@ call calmat ( exprIn = "inv([1,2,3; 0,5,6; 7,8,9])" )
 Clone the calmat project:
 
 ```
-git clone https://gitlab.oca.eu/hassani/calmat.git
+git clone https://github.com/hassaniriad/calmat.git
 ```
 It contains a copy of the pk2 project.
 

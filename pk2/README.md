@@ -1021,7 +1021,7 @@ Calmat is both a standalone program and a subroutine that a user code can call t
 The pk2 project is integrated in the calmat project. For cloning it:
 
 ```
-git  clone  https://gitlab.oca.eu/hassani/calmat.git
+git  clone  https://github.com/hassaniriad/calmat.git
 ```
 
 ### 5.1 Compiling the pk2 library (and the calmat project)
