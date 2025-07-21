@@ -507,7 +507,7 @@ We run this script in interactive mode:
 ```
 calmat -i newton2b
 ```
-which result in
+which results in
 
 <p align="left">
       <img src="./media/userfunc3.png" width="550">
