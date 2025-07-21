@@ -166,7 +166,8 @@ CONTAINS
    SUBROUTINE err_SetHaltingMode ( halting, ieee_halting, DisplayWarning, unit, &
                                    errorColor, warnColor, normalColor           )
 !=============================================================================================
-   use, intrinsic :: ieee_arithmetic
+   use, intrinsic :: ieee_exceptions, only: ieee_set_halting_mode, ieee_support_halting, &
+                     ieee_underflow, ieee_overflow, ieee_divide_by_zero, ieee_invalid
    use ansiColor_m, only: ansiColor_getAnsiCode   
    logical         , optional, intent(in) :: halting, ieee_halting, DisplayWarning
    integer  (Ikind), optional, intent(in) :: unit
@@ -205,6 +206,7 @@ CONTAINS
 
 !- local variables: --------------------------------------------------------------------------
    character(len=9) :: color
+   logical          :: ieee_halting_
 !---------------------------------------------------------------------------------------------
    
    if ( present(halting) ) then
@@ -217,12 +219,28 @@ CONTAINS
    if ( present(unit) ) then
       if ( unit /= 5 ) err_Unit = unit
    end if
-   
+
    if ( present(ieee_halting) ) then
-      call ieee_set_halting_mode (ieee_all , halting = ieee_halting) 
+      ieee_halting_ = ieee_halting
    else
-      call ieee_set_halting_mode (ieee_all , halting = err_IeeeHalt) 
+      ieee_halting_ = err_IeeeHalt
    end if
+
+!  cannot use the following on MacOS/Silicon (2025):
+!   if ( present(ieee_halting) ) then   
+!      call ieee_set_halting_mode (ieee_all , halting = ieee_halting) 
+!   else
+!      call ieee_set_halting_mode (ieee_all , halting = err_IeeeHalt) 
+!   end if
+!  workaround: verify first if it's supported:
+   if ( ieee_support_halting(ieee_underflow) ) &
+      call ieee_set_halting_mode ( ieee_underflow, halting = ieee_halting_ )
+   if ( ieee_support_halting(ieee_overflow) ) &
+      call ieee_set_halting_mode ( ieee_overflow, halting = ieee_halting_ )
+   if ( ieee_support_halting(ieee_divide_by_zero) ) &
+      call ieee_set_halting_mode ( ieee_divide_by_zero, halting = ieee_halting_ )
+   if ( ieee_support_halting(ieee_invalid) ) &
+      call ieee_set_halting_mode ( ieee_invalid, halting = ieee_halting_ )
    
    if ( present(errorColor) ) then
       color = errorColor
