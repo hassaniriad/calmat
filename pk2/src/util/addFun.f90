@@ -1355,7 +1355,7 @@ CONTAINS
 !--------------------------------------------------------------------------------------------- 
    
    if ( nfunc == 1 ) then
-      write(STDOUT,'(a)') &
+      write(STDOUT,'(a)') & 
          'The function '//listfun(1,1)%str//' was added to the library '//libName
    else
       write(STDOUT,'(a)') &
