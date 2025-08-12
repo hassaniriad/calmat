@@ -1356,7 +1356,7 @@ CONTAINS
    
    if ( nfunc == 1 ) then
       write(STDOUT,'(a)') &
-         'The function '//listfun(i,1)%str//' was added to the library '//libName
+         'The function '//listfun(1,1)%str//' was added to the library '//libName
    else
       write(STDOUT,'(a)') &
          'The following '//i2a(nfunc)//' functions were added to the library '//libName//': '
@@ -1366,6 +1366,7 @@ CONTAINS
    end if
 
    END SUBROUTINE resume
+   
    
 !=============================================================================================
    SUBROUTINE compilLib ( dynlib, delf90, stat )
