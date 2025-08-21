@@ -31,7 +31,7 @@
 
        s = 'k = ' + num2str(k) + ': || dX || = ' + num2str(norm(dX)) + ...
            ', || f || = ' + num2str(norm(fX)) ;
-       disp(s)
+       //disp(s)
 
        // Convergence criteria:
 
@@ -74,7 +74,7 @@
       real :: x, y, z
 
       // The user can handle any errors via the “opflag” module variable:
-
+     
       if ( size(v) < 3 ) then
          opflag = err_t ( stat = UERROR, where = 'f', msg = 'size(v) < 3' )
          return
@@ -82,8 +82,8 @@
 
       x = v(1) ; y = v(2) ; z = v(3)
 
-      u = [ sin(x) + y**2 + log(z) - c7, &
-            c3*x   + c2*y - z**3   + c1, &
+      u = [ sin(x) + y**2 + log(z) - c7, &  ! continuation symbols may
+            c3*x   + c2*y - z**3   + c1, &  ! be '&' or '...'
             x      + y    + z      - c5 ]
    endfortranproc
 
@@ -108,7 +108,8 @@
       real :: x, y, z
 
       if ( size(v) < 3 ) then
-         opflag = err_t ( stat = UERROR, where = 'mysystem', msg = 'size(v) < 3' )
+         opflag = err_t ( stat = UERROR, where = 'mysystem', &
+                           msg = 'size(v) < 3' )
          return
       end if
 
