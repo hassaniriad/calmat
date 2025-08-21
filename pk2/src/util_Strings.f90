@@ -402,6 +402,8 @@ CONTAINS
 !  . comments (optional): comments(1) is the symbol used for a comment, comments(2:3) are
 !                         the pair of symbols used for a commented block, e.g. 
 !                         comments(1) = '//', comments(2) = '/*', comments(3) = '*/'
+!  . contSymb (optional): continuation symbol(s), e.g. contSymb(1) = '...', contSymb(2)='&'
+!                         Default: contSymb(1) = '...'
 !  . rmblk    (optional): spaces are removed if rmblk=.true.
 !
 !  Outputs:
@@ -446,7 +448,10 @@ CONTAINS
          lenSymb(i) = len_trim(contSymb_(i))
       end do
    else
-      nContSymb = 0
+      nContSymb = 1
+      allocate(character(len=3)::contSymb_(1))
+      allocate(lenSymb(1))
+      contSymb_(1) = '...' ; lenSymb  (1) = 3
    end if
 !
 !- Spaces will be removed (default) from "Rec" if "rm" is .true.:
