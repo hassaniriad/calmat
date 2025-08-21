@@ -1,0 +1,14 @@
+
+<< Hello from newton2 >>
+
+Warning: not converged in nmax = 30000 iterations.
+
+Solution found: 0.6330648
+                2.3934448
+                1.9734905
+
+Residual norm: 0
+
+cpu time: 0.86146500000000004
+
+<< End newton2 >>
