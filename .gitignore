@@ -1,5 +1,6 @@
 **.[oa]
 **.mod
+**.so
 mod/
 obj/
 bin/
