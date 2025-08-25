@@ -7142,7 +7142,12 @@ CONTAINS
 
    if ( allocated(self%m) ) then
       select type (p=>self%m)
-         type is (sk2_t) ; mat = p%v
+         type is (sk2_t) ; ! mat = p%v ! pb with gfortran
+            if ( allocated(mat) ) then
+               if ( size(mat,1) /= p%nrow .or. size(mat,2) /= p%ncol ) deallocate(mat)
+            end if
+            if ( .not. allocated(mat) ) allocate(mat(p%nrow,p%ncol))
+            mat = p%v
          class default
             call opflag%set (stat = UERROR, where = HERE, msg = 'A string pk2 array expected')
             if ( present(stat) ) stat = opflag
@@ -7309,7 +7314,12 @@ CONTAINS
 
    if ( allocated(self%m) ) then
       select type (p=>self%m)
-         type is (sk2_t) ; vec = pack(p%v,mask=.true.)
+         type is (sk2_t) ; !vec = pack(p%v,mask=.true.) ! pb with gfortran
+            if ( allocated(vec) ) then
+               if ( size(vec) /= p%nrow * p%ncol ) deallocate(vec)
+            end if
+            if ( .not. allocated(vec) ) allocate(vec(p%nrow*p%ncol))
+            vec = pack(p%v,mask=.true.)
          class default
             call opflag%set (stat = UERROR, where = HERE, msg = 'A string pk2 array expected')
             if ( present(stat) ) stat = opflag
