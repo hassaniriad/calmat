@@ -242,7 +242,7 @@ CONTAINS
 !- local variables ---------------------------------------------------------------------------
    character(len=*             ), parameter   :: HERE = 'util_pwd'   
    character(kind=c_char, len=:), allocatable :: dir
-   integer  (c_long            )              :: i, ldir, iguess, lguess, nguess, err
+   integer  (c_size_t          )              :: i, ldir, iguess, lguess, nguess, err
    type     (c_ptr             )              :: buf
 !---------------------------------------------------------------------------------------------    
 
