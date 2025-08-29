@@ -206,9 +206,9 @@ libpk2: $(obj) $(obju)
 	$(arch) $(archflag) $(dirlib)/$(libpk2) $(obj) $(obju)
 	$(ranlib) $(dirlib)/$(libpk2)
 # shared version:
-	$(comp) $(flags) $(flagdynlib) $(obj) $(obju) $(liblapack) -o $(dirlib)/$(libpk2dyn)
+#	$(comp) $(flags) $(flagdynlib) $(obj) $(obju) $(liblapack) -o $(dirlib)/$(libpk2dyn)
 # utility:
-	$(comp) $(flags) $(dirlib)/$(libpk2) $(liblapack) util/addFun.f90 -o $(dirbin)/addFun
+	$(comp) $(flags) util/addFun.f90 -I $(dirmod) -L$(dirlib) -lpk2 $(liblapack) -o $(dirbin)/addFun
 	
 	@echo ""
 	$(call colorBlue, "*****************************************")

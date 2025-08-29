@@ -190,12 +190,12 @@ calmat: $(obj)
 #  linking with the static pk2 library (=> calmat_s.exe):
 	$(comp) $(obj) $(flags) $(libs) -o $(direxe)/$(execs)
 #  linking with the shared pk2 library (=> calmat_d.exe):
-	$(comp) $(obj) $(flags) $(libd) -o $(direxe)/$(execd)
+#	$(comp) $(obj) $(flags) $(libd) -o $(direxe)/$(execd)
 #  static calmat library:
 	$(arch) $(archflag) $(libcalmat) $(obj0)
 	$(ranlib) $(libcalmat) 
 #  shared calmat library:
-	$(comp) $(flags) $(flagdynlib) $(obj) $(libd) -o $(dirlib)/libcalmat_d.so
+#	$(comp) $(flags) $(flagdynlib) $(obj) $(libd) -o $(dirlib)/libcalmat_d.so
 	@echo " "
 	$(call colorBlue, "******************************************")
 	$(call colorBlue, "***  Successful compilation of calmat  ***")
