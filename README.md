@@ -179,7 +179,7 @@ Once calmat is running a prompt is displayed and it waits for an input. Enter yo
 
 	<p align="left">
       <img src="./media/list_of_builtin_func1.png" width="550">
-      <img src="./media/list_of_builtin_func2b.png" width="550">
+      <img src="./media/list_of_builtin_func2.png" width="550">
       <img src="./media/list_of_builtin_func3.png" width="550">
 	</p>   
     	
