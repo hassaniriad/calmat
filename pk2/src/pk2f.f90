@@ -158,6 +158,13 @@ MODULE pk2f_m
    interface s_colon
       module procedure pk2f_subcolon, pk2f_subcoloni, pk2f_subcolonr, pk2f_subcolonwrp
    end interface 
+   
+   interface linspace
+      module procedure pk2f_linspace, pk2f_linspacewrp
+   end interface  
+   interface s_linspace
+      module procedure pk2f_sublinspace, pk2f_sublinspacewrp
+   end interface    
 
 !- array reshaping:
    interface reshape
@@ -9864,7 +9871,7 @@ CONTAINS
          err = 2   
    end select      
 
-   if ( err == 1 .or. a%nrow /= 1 .or. b%ncol /= 1 ) then
+   if ( err == 1 .or. a%nrow /= 1 .or. a%ncol /= 1 ) then
       call opflag%set (stat=UERROR, where=HERE, msg="Arguments of << : >> must be scalars")
       return
    end if
@@ -9949,7 +9956,6 @@ CONTAINS
    class(pk2_t), intent(in out) :: res
 !--------------------------------------------------------------------------------------------- 
 !  Returns the linearly spaced n-vector (1 x n) "d = a:c:b"   
-!  The step is given by c (if not present, consider a step of 1)
 !-----------------------------------------------------------------------------------R.H. 04/18
 
 !- local variables ---------------------------------------------------------------------------           
@@ -10026,6 +10032,315 @@ CONTAINS
    END FUNCTION pk2f_COLONwrp
       
 
+!=============================================================================================   
+   SUBROUTINE pk2f_subLINSPACEi ( x1, x2, res, n )
+!=============================================================================================     
+   integer(Ikind),           intent(in    ) :: x1, x2
+   class  (pk2_t),           intent(   out) :: res   
+   integer(Ikind), optional, intent(in    ) :: n
+!--------------------------------------------------------------------------------------------- 
+!  Returns the linearly spaced n-vector (1 x n)   
+!  If the step is not present, consider n = 100
+!-----------------------------------------------------------------------------------R.H. 04/18
+
+!- local variables ---------------------------------------------------------------------------           
+   integer(Ikind) :: np, i, istep
+   real   (Rkind) :: rstep
+!---------------------------------------------------------------------------------------------      
+
+   if ( opflag%code > IZERO ) return !!call opflag%set ()
+
+   if ( present(n) ) then
+      np = n
+   else
+      np = 100
+   end if         
+
+   if ( np > 0 ) then      
+      if ( mod(x2-x1,np-1) == 0 ) then
+         istep = (x2-x1)/(np-1)
+         res = reshape( [(i,i=0,n-1)] * istep + x1, [IONE,n] )
+      else
+         rstep = real(x2-x1,Rkind) / real(np-1,Rkind)
+         res = reshape( [(i,i=0,n-1)] * rstep + real(x1,Rkind), [IONE,n] )
+      end if   
+   else      
+      call opflag%set ( stat = WARNING, where = "pk2f_subLINSPACEi",           &
+                         msg = "operation << c = linspace(a,b,0) >> is empty (c=[Ê])" ) 
+   end if   
+
+   END SUBROUTINE pk2f_subLINSPACEi
+   
+   
+!=============================================================================================   
+   FUNCTION pk2f_LINSPACEi ( x1, x2, n ) result ( res )
+!=============================================================================================     
+   integer(Ikind),           intent(in) :: x1, x2
+   integer(Ikind), optional, intent(in) :: n
+   type   (pk2_t)                       :: res
+!--------------------------------------------------------------------------------------------- 
+
+   call pk2f_subLINSPACEi (x1, x2, res, n) ; error_TraceNreturn(opflag, "pk2f_LINSPACEi")
+   
+   END FUNCTION  pk2f_LINSPACEi
+   
+   
+!=============================================================================================   
+   SUBROUTINE pk2f_subLINSPACE ( a, b, res, c ) 
+!=============================================================================================     
+   class(pk2_t),           intent(in    ) :: a, b
+   class(pk2_t),           intent(in out) :: res
+   class(pk2_t), optional, intent(in    ) :: c
+!--------------------------------------------------------------------------------------------- 
+!  Returns the linearly spaced n-vector (1 x n)
+!  If c is not present, set n = 100
+!-----------------------------------------------------------------------------------R.H. 04/18
+
+!- local variables ---------------------------------------------------------------------------
+   character(len=*), parameter :: HERE = 'pk2f_subLINSPACE'      
+   integer  (Ikind)            :: cnrow, cncol, abtype, n, i, err
+   integer  (Ikind)            :: i1, i2, istep
+   real     (Rkind)            :: r1, r2, rstep
+   complex  (Rkind)            :: c1, c2, cstep
+!---------------------------------------------------------------------------------------------      
+
+   if ( opflag%code > IZERO ) return !!call opflag%set ()
+   
+   if ( .not. allocated(a%m) .or. .not. allocated(b%m) .or. .not. allocated(c%m)) then
+      call opflag%set (stat = UERROR, where = HERE, msg = "Invalid data for << : >>")
+      return
+   end if   
+       
+   err = 0   
+!
+!- Get the number of points ("n"):
+!   
+   if ( present(c) ) then
+      cnrow = c%nrow ; cncol = c%ncol 
+      if ( allocated(c%m) ) then
+         select type (p=>c%m)
+            type is (ik2_t)
+               if ( allocated(p%v) .and. p%ncol >= 1 .and. p%nrow >=1 ) then
+                  n = p%v(1,1)
+               else
+                  n = 100
+               end if      
+            class default
+               err = 2
+         end select
+      else
+         cnrow = 1 ; cncol = 1 ; n = 100  ! if empty set npoin = 100
+      end if
+   else
+      cnrow = 1 ; cncol = 1 ; n = 100   ! if not present set npoin = 100
+   end if          
+
+   if ( cnrow /= 1 .or. cncol /= 1 ) then
+      call opflag%set ( stat = UERROR, where = HERE, &
+                         msg = "The number of points must be scalar" )
+      return
+   end if
+            
+   if ( err == 2 ) then
+      call opflag%set ( stat = UERROR, where = HERE, &
+                          msg= "The number of points must be integer" ) 
+      return
+   end if  
+
+   abtype = max(a%typ, b%typ)
+!
+!- Get the first bound:
+!      
+   select type (p=>a%m)
+      type is (ik2_t)
+         if ( allocated(p%v) .and. p%ncol >= 1 .and. p%nrow >= 1 ) then
+            i1 = p%v(1,1)
+            if ( abtype == RTYP ) then
+               r1 = i1
+            else
+               c1 = i1
+            end if
+         else
+            err = 1
+         end if
+      type is (rk2_t)
+         if ( allocated(p%v) .and. p%ncol >= 1 .and. p%nrow >= 1 ) then
+            r1 = p%v(1,1)
+            if ( abtype == CTYP ) c1 = r1
+         else
+            err = 1
+         end if
+      type is (ck2_t)
+         if ( allocated(p%v) .and. p%ncol >= 1 .and. p%nrow >= 1 ) then
+            c1 = p%v(1,1)
+         else
+            err = 1
+         end if         
+      class default
+         err = 2   
+   end select      
+
+   if ( err == 1 .or. a%nrow /= 1 .or. a%ncol /= 1 ) then
+      call opflag%set ( stat = UERROR, where = HERE, &
+                         msg = "Bounds in << linspace >> must be scalars" )
+      return
+   end if
+            
+   if ( err == 2 ) then
+      call opflag%set ( stat = UERROR, where = HERE, &
+                     msg = "Bounds in << linspace >> must be integers, reals or complexes" ) 
+      return      
+   end if   
+!
+!- Get the second bound:
+!
+   select type (p=>b%m)
+      type is (ik2_t)
+         if ( allocated(p%v) .and. p%ncol >= 1 .and. p%nrow >= 1 ) then
+            i2 = p%v(1,1)
+            if ( abtype == RTYP ) then
+               r2 = i2
+            else if ( abtype == CTYP ) then
+               c2 = i2
+            end if
+         else
+            err = 1
+         end if
+      type is (rk2_t)
+         if ( allocated(p%v) .and. p%ncol >= 1 .and. p%nrow >= 1 ) then
+            r2 = p%v(1,1)
+            if ( abtype == CTYP ) c2 = r2
+         else
+            err = 1
+         end if
+      type is (ck2_t)
+         if ( allocated(p%v) .and. p%ncol >= 1 .and. p%nrow >= 1 ) then
+            c2 = p%v(1,1)
+         else
+            err = 1
+         end if
+      class default
+         err = 2     
+   end select      
+   
+   if ( err == 1 .or. b%nrow /= 1 .or. b%ncol /= 1 ) then
+      call opflag%set ( stat = UERROR, where = HERE, &
+                         msg = "Bounds in << linspace >> must be scalars" )
+      return
+   end if
+            
+   if ( err == 2 ) then
+      call opflag%set ( stat = UERROR, where = HERE, &
+                     msg = "Bounds in << linspace >> must be integers, reals or complexes" ) 
+      return      
+   end if   
+
+!
+!- Compute res:
+!      
+   if ( n > 0 ) then    
+      if ( abtype == ITYP ) then
+         if ( mod(i2-i1,n-1) == 0 ) then
+            istep = (i2-i1) / (n-1)
+            res = reshape( [(i,i=0,n-1)] * istep + i1, [IONE,n] )
+         else
+            rstep = real(i2-i1,Rkind) / real(n-1,Rkind)
+            res = reshape( [(i,i=0,n-1)] * rstep + real(i1,Rkind), [IONE,n] )
+         end if
+      else if ( abtype == RTYP ) then
+         rstep = (r2-r1) / real(n-1,Rkind)
+         res = reshape( [(i,i=0,n-1)] * rstep + r1, [IONE,n] )
+      else if ( abtype == CTYP ) then
+         cstep = (c2-c1) / real(n-1,Rkind)
+         res = reshape( [(i,i=0,n-1)] * cstep + c1, [IONE,n] )
+      end if
+   else      
+      call opflag%set ( stat = WARNING, where = HERE,                       &
+                         msg = "Operation << c = linspace(a,b,0) >> is empty (c=[Ê])" ) 
+      res = pk2_t()
+   end if   
+
+   END SUBROUTINE pk2f_subLINSPACE
+   
+   
+!=============================================================================================   
+   FUNCTION pk2f_LINSPACE ( a, b, c ) result ( res )
+!=============================================================================================     
+   class(pk2_t),           intent(in) :: a, b
+   class(pk2_t), optional, intent(in) :: c
+   type (pk2_t)                       :: res
+!--------------------------------------------------------------------------------------------- 
+
+   call pk2f_subLINSPACE ( a, b, res, c ) ; error_TraceNreturn(opflag, "pk2f_LINSPACE")
+   
+   END FUNCTION pk2f_LINSPACE
+   
+   
+!=============================================================================================   
+   SUBROUTINE pk2f_subLINSPACEwrp ( matrs, res )
+!=============================================================================================     
+   class(pk2_t), intent(in    ) :: matrs(:)
+   class(pk2_t), intent(in out) :: res
+!--------------------------------------------------------------------------------------------- 
+!  Returns the linearly spaced n-vector (1 x n)  
+!-----------------------------------------------------------------------------------R.H. 04/18
+
+!- local variables --------------------------------------------------------------------------- 
+   integer(Ikind) :: nmatrs          
+!---------------------------------------------------------------------------------------------      
+
+   if ( opflag%code > IZERO ) return !!call opflag%set ()
+
+   nmatrs = size(matrs)
+   
+   if ( nmatrs == 3 ) then
+      call pk2f_subLINSPACE ( a = matrs(1), b = matrs(2), c = matrs(3), res = res )
+   else if ( nmatrs == 2 ) then
+      call pk2f_subLINSPACE ( a = matrs(1), b = matrs(2), res = res )
+   else
+      call opflag%set ( stat = UERROR, where = "pk2f_subLINSPACEwrp",     &
+                         msg = "2 or 3 arguments expected for << linspace >>" )
+      return
+   end if
+   
+   END SUBROUTINE pk2f_subLINSPACEwrp
+   
+   
+!=============================================================================================   
+   FUNCTION pk2f_LINSPACEwrp ( matrs ) result ( res )
+!=============================================================================================     
+   class(pk2_t), optional, intent(in) :: matrs(:)
+   type (pk2_t)                       :: res
+!--------------------------------------------------------------------------------------------- 
+
+!- local variables ---------------------------------------------------------------------------           
+   type   (str_t) :: h(8), f1
+!---------------------------------------------------------------------------------------------      
+
+   if ( opflag%code > IZERO ) return !!call opflag%set ()
+
+   if ( .not. present(matrs) ) then
+!
+!-    return in "res" some helps (for calmat) and exit:
+!      
+      f1 = str_color('linspace',pk2f_helpcol)
+      h( 1) = "<< "+f1+" >> returns a row vector of evenly spaced points"
+      h( 2) = " "
+      h( 3) = "Syntax:  x = "+f1+"(a,b,n)  "
+      h( 4) = " "
+      h( 5) = " . a, b: bounds of the interval (integers, reals or complexes)"
+      h( 6) = " . n   : number of points (integer)"
+      h( 7) = " . x   : set of the n points evenly spaced"
+      h( 8) = " "
+      call pk2_assign ( res, h )
+      return
+   end if   
+   
+   call pk2f_subLINSPACEwrp ( matrs, res ) ; error_TraceNreturn(opflag, "pk2f_LINSPACEwrp")   
+
+   END FUNCTION pk2f_LINSPACEwrp
+   
+   
 !=============================================================================================   
    FUNCTION pk2f_EXTRACMAT0 ( a, vindx, vjndx ) result ( res )
 !=============================================================================================     
@@ -18795,6 +19110,8 @@ CONTAINS
                res = svd()  
             case('poldec')
                res = poldec()
+            case('linspace')
+               res = linspace()
             case('help',' ')
                res = pk2f_HELP()
                

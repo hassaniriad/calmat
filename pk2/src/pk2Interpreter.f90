@@ -149,7 +149,7 @@ MODULE pk2Interpreter_m
       procedure, pass, public :: Init    => pk2Interpreter_InitHdl 
    end type hdl_t
    
-   integer  (Ikind), public, parameter    :: NFC = 102, & ! number of usual functions
+   integer  (Ikind), public, parameter    :: NFC = 103, & ! number of usual functions
                                              NOP = 32, &  ! number of operators
                                              NFU = 100    ! max number of user's functions
    integer  (Ikind), public               :: nuserf = 0                               
@@ -165,7 +165,7 @@ MODULE pk2Interpreter_m
    logical         , private, save        :: firsttime = .true.                                
 
 ! To add a function follow these steps:
-!  0) increase NFC (eg. NFC = 103)
+!  0) increase NFC (eg. NFC = 104)
 !  1) add its name in the function list FuncList (cf. pk2Interpreter_FuncAndOperList)
 !  2) add a call to this function in the select case block of pk2Interpreter_EvalExpr_v2
 !  3) code this function in the module pk2f.f90 or another one
@@ -2313,6 +2313,11 @@ CONTAINS
                nsused = max(nsused,1_Ikind)
             end if   
             st = k0
+            
+         case ( NOP+103 )
+            k0 = st-narg(i)+1 ; assignto = k0
+            call s_LINSPACE  (matrs=[(pdata(k),k=k0,st)], res=res)
+            st = k0
 !
 !-       Values of a variable (or a subset (sub-matrix) of them):
 !                              
@@ -4362,7 +4367,9 @@ CONTAINS
    FuncList(100) = "svd"    ; FuncDesc(100) = "Singular values decomposition"
    FuncList(101) = "poldec" ; FuncDesc(101) = "Polar decomposition"
 
-   FuncList(102) = "sinc"   ; FuncDesc(102) = "Cardinal sine function (= sin(x)/x) "
+   FuncList(102) = "sinc"   ; FuncDesc(102) = "Cardinal sine function (= sin(x)/x)"
+
+   FuncList(103) = "linspace"; FuncDesc(103) = "Row vector of evenly spaced points"
 
    call userProcList ( nfunc = nuserf, funcList = userFuncList )
       
