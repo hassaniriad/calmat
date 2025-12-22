@@ -149,7 +149,7 @@ Note: If you have `rlwrap` installed ([https://github.com/hanslub42/rlwrap](http
 or better (use an alias for convenience):
     
 ```
-        $ rlwrap -c w 0 calmat
+        $ rlwrap -c -w 0 calmat
 ```
 (`-c` allows file name completion).
 
@@ -1111,7 +1111,7 @@ Here arre a simple calmat script and a user program. More examples of scripts an
 ```fortran
 program sample09_userExpression2
 !-----------------------------------------------------------------------------------------------
-!  In this example the user give:
+!  In this example the user gives:
 !
 !   - a literal element-wise expression involving the coordinates of mesh nodes (given in
 !     a 2 x n array coord), for example: 
