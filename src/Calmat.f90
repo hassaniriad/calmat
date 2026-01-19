@@ -275,7 +275,7 @@ CONTAINS
    integer  (Ikind )              :: ui, nSubRec, numl, i, nread, iread, nL, err
    integer  (Ikind )              :: nfor, nif, nwait, nfortproc
    character(len=30)              :: waitingfor(NESTED)
-   logical                        :: ignore
+   logical                        :: gotoToNextSubRec
 !--------------------------------------------------------------------------------------------- 
 
    if ( G_task /= G_CONTINUE ) return
@@ -283,7 +283,7 @@ CONTAINS
 !print*,'*** Calmat_read ***'
 !print*,'flowId =',flowId, 'ui = ',G_flows(flowId)%unit,'G_dispPrompt= ',G_dispPrompt 
    
-   nwait = 0 ; nif = 0 ; nfor = 0 ; nfortproc = 0 ; err = 0 ; ignore = .false.
+   nwait = 0 ; nif = 0 ; nfor = 0 ; nfortproc = 0 ; err = 0 
    
    !start = 1
    G_flows(flowId)%start = 1 !19/04/24
@@ -349,7 +349,7 @@ CONTAINS
          numl = 1
       end if
       
-      rec0 = rec    
+      rec0 = rec  
 !
 !-    see if a block construct has not been completed while the eof has been reached:
 ! 
@@ -415,9 +415,9 @@ CONTAINS
 !     (note: ',' and ';' enclosed between a pair of symbols given in "opcl" are not considered
 !     as delimiters of records):
 !   
-      if ( nfortproc > 0 .or. ignore ) then
-         ! do not split the record when this is a line of a user fortran procedure (it will be
-         ! ignored anyway) 
+      if ( nfortproc > 0 ) then
+         ! don't spend time splitting the record when this is a line of a user fortran 
+         ! procedure (it will be ignored anyway) 
          nSubRec = 1
          if ( .not. allocated(subRec) ) allocate(subRec(1,2))
          subRec(1,1) = rec ; subRec(1,2) = ''
@@ -426,7 +426,7 @@ CONTAINS
                                       tokens = subRec, stat = G_flagerr )
       end if
       
-      ignore = .false.
+      gotoToNextSubRec = .false.
       
       if ( G_flagerr > IZERO ) then   
          call G_flagerr%AddTrace(HERE); err = 1 ; exit
@@ -447,12 +447,12 @@ CONTAINS
                end if
             
                nfortproc = nfortproc + 1
-               
-               ignore = .true.
+               gotoToNextSubRec = .true.
                            
-            else if ( util_RemoveSpaces1(subRec(i,1)%str) == 'endfortranproc' ) then
+            else if ( index(subRec(i,1)%str, 'endfortranproc') == 1 ) then
 
                nfortproc = nfortproc - 1
+               
                if ( nfortproc < 0 ) then
                   err = 1
                   call G_flagerr%set ( msg = 'Unexpected "endfortranproc"', &
@@ -460,7 +460,7 @@ CONTAINS
                   exit
                end if
 
-               ignore = .true.
+               gotoToNextSubRec = .true.
             
             end if
             
@@ -524,7 +524,10 @@ CONTAINS
          
          if ( err /= 0 ) exit 
 
-         if ( nfortproc > 0 .or. ignore) cycle     
+         if ( nfortproc > 0 .or. gotoToNextSubRec ) then
+            gotoToNextSubRec = .false.
+            cycle
+         endif   
 
          call G_flows(flowId)%insertRecordsIntoStack ( SubRec, flowId, G_flagerr )
       
