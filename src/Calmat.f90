@@ -252,7 +252,7 @@ CONTAINS
       if ( stat > IZERO) call stat%AddTrace(HERE)
    end if
       
-   G_task = G_CONTINUE   
+   G_task = G_CONTINUE     
 
    END SUBROUTINE Calmat
 
@@ -1395,17 +1395,31 @@ CONTAINS
 !
    nan = ieee_value(nan, IEEE_QUIET_NAN) ; inf = ieee_value(inf, IEEE_POSITIVE_INF)
 
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(CIMAG, name = "%i"   ), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(PI   , name = "%pi"  ), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(NEPER, name = "%e"   ), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(EPS  , name = "%eps" ), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(IMAX , name = "%imax"), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(RMIN , name = "%rmin"), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(RMAX , name = "%rmax"), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(LZERO, name = "%f"   ), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(LONE , name = "%t"   ), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(inf  , name = "%inf" ), status = G_PROTECTED )
-   n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(nan  , name = "%nan" ), status = G_PROTECTED )
+   !01/2026: I don't know why, but the following lines cause a bug with flang 
+   !        (in fact, status is reset to 0).
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(CIMAG, name = "%i"   ), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(PI   , name = "%pi"  ), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(NEPER, name = "%e"   ), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(EPS  , name = "%eps" ), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(IMAX , name = "%imax"), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(RMIN , name = "%rmin"), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(RMAX , name = "%rmax"), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(LZERO, name = "%f"   ), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(LONE , name = "%t"   ), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(inf  , name = "%inf" ), status = G_PROTECTED )
+   !n = n + 1 ; G_vars(n) = var_t ( p = pk2_t(nan  , name = "%nan" ), status = G_PROTECTED )
+   ! workaround:
+   n = n + 1 ; G_vars(n) = CIMAG; G_vars(n)%name = '%i'    ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = PI   ; G_vars(n)%name = "%pi"   ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = NEPER; G_vars(n)%name = "%e"    ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = EPS  ; G_vars(n)%name = "%eps"  ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = IMAX ; G_vars(n)%name = "%imax" ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = RMIN ; G_vars(n)%name = "%rmin" ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = RMAX ; G_vars(n)%name = "%rmax" ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = LZERO; G_vars(n)%name = "%f"    ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = LONE ; G_vars(n)%name = "%t"    ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = INF  ; G_vars(n)%name = "%inf"  ; G_vars(n)%status = G_PROTECTED
+   n = n + 1 ; G_vars(n) = NAN  ; G_vars(n)%name = "%nan"  ; G_vars(n)%status = G_PROTECTED
 !
 !- be quiet! nan and inf are not your enemies here:
 !
@@ -1522,7 +1536,7 @@ CONTAINS
    call err_SetHaltingMode ( halting = halting, unit = STDOUT, DisplayWarning = warn )  
    
    G_disp = dispr
-    
+ 
    END SUBROUTINE Calmat_Initialize
    
    

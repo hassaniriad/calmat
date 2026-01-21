@@ -1399,8 +1399,14 @@ CONTAINS
       usedCompiler = 'nagfor'
    else if ( index(usedCompiler,'gcc') > 0 .or. index(usedCompiler,'gfortran') > 0) then
       usedCompiler = 'gfortran'
-   else if ( index(usedCompiler,'intel') > 0 ) then
+   else if ( index(usedCompiler,'ifort') > 0 ) then
       usedCompiler = 'ifort'
+   else if ( index(usedCompiler,'ifx') > 0 ) then
+      usedCompiler = 'ifx'
+   else if ( index(usedCompiler,'flang-new') > 0 ) then
+      usedCompiler = 'flang-new'
+   else if ( index(usedCompiler,'flang') > 0 ) then
+      usedCompiler = 'flang'
    end if
 #endif
 
@@ -1408,13 +1414,17 @@ CONTAINS
       flags = ' -fpp -kind=byte -ieee=full '
       if ( len_trim(moduledir) > 0 ) flags = flags // '-mdir '//moduledir//' '
       flagdyn = ' -PIC -Wl,-shared '
-   else if ( usedCompiler == 'ifort' ) then
+   else if ( usedCompiler == 'ifort' .or.  usedCompiler == 'ifx' ) then
       flags = ' -fpp '
       if ( len_trim(moduledir) > 0 ) flags = flags // '-module '//moduledir//' '
       flagdyn = ' -fPIC -shared '
    else if ( usedCompiler == 'gfortran' ) then
       flags = ' -cpp '
       if ( len_trim(moduledir) > 0 ) flags = flags // '-J '//moduledir//' '
+      flagdyn = ' -fPIC -shared '
+   else if ( usedCompiler == 'flang' .or. usedCompiler == 'flang-new') then
+      flags = ' -cpp '
+      if ( len_trim(moduledir) > 0 ) flags = flags // '-module-dir '//moduledir//' '
       flagdyn = ' -fPIC -shared '
    else
       stat = err_t(stat=UERROR, msg="Unknown compiler '"//usedCompiler// &

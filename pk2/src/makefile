@@ -109,7 +109,7 @@ liblapack = -llapack -lblas
 INTEL := ifort ifx
 GNU := gfortran gfortran-14 gfortran-11
 NAG := nagfor
-
+FLANG := flang flang-new
 
 ifeq ($(kind),)
 #
@@ -158,6 +158,17 @@ else ifneq ($(filter $(comp),$(NAG)),)
    flags = $(OPTS) -fpp -kind=byte -ieee=full -mdir $(dirmod) -I $(dirmod)
    flagdynlib = -PIC -Wl,-shared
 
+else ifneq ($(filter $(comp),$(FLANG)),)
+   ifeq ($(opt),)
+      OPTS += -O3
+   else ifeq ($(opt),check)
+      OPTS += -Og -fimplicit-none   
+   else       
+      OPTS += $(opt)
+   endif   
+   flags = $(OPTS) -cpp -module-dir $(dirmod) -I $(dirmod)
+   flagdynlib = -PIC -Wl,-shared
+   
 else
    $(error unknown compiler ($(comp)), please adapt the pk2/app/calmat/src/makefile)
 

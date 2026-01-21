@@ -1085,7 +1085,7 @@ CONTAINS
       select case ( opt )
       
          case ( 'vars' )
-                     
+
             n = 0
             do i = 1, G_nVar
                if ( G_vars(i)%status /= G_FREE   .and. &
@@ -1094,7 +1094,6 @@ CONTAINS
                   if ( len_trim(G_vars(i)%GetName()) /= 0 ) n = n + 1
                end if
             end do
-
             do i = 1, G_nObj
                if ( G_objs(i)%status /= G_FREE   .and. &
                     G_objs(i)%status /= G_HIDDEN       ) n = n + G_objs(i)%nCmp + 1

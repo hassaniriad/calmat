@@ -1,0 +1,123 @@
+//
+// This script must be executed with the option -i:
+//
+//        calmat -i channel
+//
+// since it contains a fortran procedure that need to be compiled by calmat
+
+
+
+// ====================================================================
+// Flow of a power-law fluid in a channel driven by a pressure gradient
+// ====================================================================
+//
+// We solve the non-linear equation 
+//
+//    (eta*v')' - gradp = 0,
+//    v(-e/2) = v(e/2) = 0
+//
+// where gradp = (pL-p0)/L is the pressure gradient and eta is the viscosity
+// given by
+//
+//    eta = beta * ( (v')^2 + eps^2 )^(alpha/2)
+//
+// where eps is a regularization term, beta and alpha are two constants, with
+// alpha = (1/N)-1 <= 0 (N >= 1). 
+//
+// When N = 1 (alpha=0), the problem is linear (newtonian fluid) and the solution 
+// is simply given by
+//
+//              v(x) = (0.5*gradp/beta)*(x-e/2)*(x+e/2)
+//
+// This ODE is solved by FDM using Picard's iterations: until convergence do
+//
+// - compute the viscosity eta_k using the velocity v_k at the previous iteration
+//
+// - solve the Poisson problem for the new velocity v_{k+1}:
+//        v'' = gradp / eta_k
+//        v(-e/2) = v(e/2) = 0
+
+clear
+
+// Data :
+// ----
+
+   L = 1 ; e = 1 ;   // length and width of the channel
+   p0 = 1 ; pL =-1 ; // upstream and downstream pressure
+
+   gradp = (pL-p0)/L ; // pressure gradient
+
+   beta = 1 ;    // pre-exponential term of the power-law 
+   Ncas = 1:5 ;  // used values of the power
+   eps = 1e-10 ; // regularization term
+
+// Node positions:
+
+   n = 100 ; // number of nodes
+   x = (linspace(-e/2,e/2,n))' ; // node positions
+   h = x(2)-x(1) ; // mesh size
+
+// Form the matrix (centered approximation of the second derivative):
+
+   u0 = 2*ones(n,1) ; u1 = ones(n-1,1) ;
+   A =-diag(u0) + diag(u1,1) + diag(u1,-1) ; 
+   A(1,:) = 0 ; A(1,1) = 1 ; A(n,:) = 0; A(n,n)=1 ;
+
+   hA = lu(A);
+
+// Initialization of the nodal velocities (for each value of N):
+   
+   vcas = zeros(n,length(Ncas)) ;
+
+// Picard's iterations:
+
+   iconv = 0 ; tol = 1e-6 ; nitermax = 1000 ;  h2 = h^2 ;
+
+   for cas = 1:length(Ncas)
+       N = Ncas(cas) ;
+       v = zeros(x) ; 
+
+       eta = visco ( x, v, beta, (1/N)-1, eps ) ;
+
+       for k = 1:nitermax
+           vold = v ; 
+           B = h2*gradp./eta ; B(1) = 0 ; B(n) = 0 ;
+           v = lusolv(hA,B); 
+           eta = visco ( x, v, beta, (1/N)-1, eps ) ;
+           if norm(v-vold) <= tol*norm(v) then
+              iconv = k-1 ; 
+              break ;
+           end if
+       end for
+
+       if iconv == 0 then
+          s = num2str(nitermax);
+          disp('Failed to converge in '+s+' iterations')
+       else
+          s = num2str(iconv);
+          disp('Convergence achieved in '+s+' itérations')
+       end if
+       vcas(:,cas) = v/mean(v) ;
+   end for
+
+   plot(x, vcas(:,1),  x,vcas(:,2),  x, vcas(:,3),  x, vcas(:,4),  x, vcas(:,5) )
+
+
+   fortranproc [eta] = visco ( x, v, beta, alpha, eps )
+      real              :: x(:), v(:), beta, alpha, eps
+      real, allocatable :: eta(:)
+
+      if ( .not. allocated(eta) ) allocate(eta, mold=v)
+      call deriv(x,v,eta)
+      eta = beta * (eps**2 + eta**2)**(alpha/2)
+   
+      contains
+         subroutine deriv(x,v,dv)
+            real, intent(in)    :: x(:), v(:)
+            real, intent(inout) :: dv(:)
+            integer :: i
+            do i = 2, size(x,1)-1
+               dv(i) = ( v(i+1) - v(i-1) ) / ( x(i+1) - x(i-1) )
+            end do
+         end subroutine deriv
+   endfortranproc visco

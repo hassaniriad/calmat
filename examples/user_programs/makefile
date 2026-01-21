@@ -96,6 +96,11 @@ else
          opt_optim = -O0
          opt_check = -C=all
       endif
+
+      ifeq ($(comp),flang-new)
+         opt_optim = -O0
+      endif
+
    else
 #
 #     User's options:

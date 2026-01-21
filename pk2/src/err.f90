@@ -233,14 +233,15 @@ CONTAINS
 !      call ieee_set_halting_mode (ieee_all , halting = err_IeeeHalt) 
 !   end if
 !  workaround: verify first if it's supported:
-   if ( ieee_support_halting(ieee_underflow) ) &
-      call ieee_set_halting_mode ( ieee_underflow, halting = ieee_halting_ )
-   if ( ieee_support_halting(ieee_overflow) ) &
-      call ieee_set_halting_mode ( ieee_overflow, halting = ieee_halting_ )
-   if ( ieee_support_halting(ieee_divide_by_zero) ) &
-      call ieee_set_halting_mode ( ieee_divide_by_zero, halting = ieee_halting_ )
-   if ( ieee_support_halting(ieee_invalid) ) &
-      call ieee_set_halting_mode ( ieee_invalid, halting = ieee_halting_ )
+!! 01/2026: Unfortunately with flang I get: undefined symbols for architecture arm64:"_fedisableexcept"
+!!   if ( ieee_support_halting(ieee_underflow) ) &
+!!      call ieee_set_halting_mode ( ieee_underflow, halting = ieee_halting_ )
+!!   if ( ieee_support_halting(ieee_overflow) ) &
+!!      call ieee_set_halting_mode ( ieee_overflow, halting = ieee_halting_ )
+!!   if ( ieee_support_halting(ieee_divide_by_zero) ) &
+!!      call ieee_set_halting_mode ( ieee_divide_by_zero, halting = ieee_halting_ )
+!!   if ( ieee_support_halting(ieee_invalid) ) &
+!!      call ieee_set_halting_mode ( ieee_invalid, halting = ieee_halting_ )
    
    if ( present(errorColor) ) then
       color = errorColor

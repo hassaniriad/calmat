@@ -116,6 +116,7 @@ $(shell mkdir -p $(dirlib))
 INTEL := ifort ifx
 GNU := gfortran gfortran-14 gfortran-11
 NAG := nagfor
+FLANG := flang flang-new
               
 ifneq ($(filter $(comp),$(GNU)),)
    ifeq ($(opt),)
@@ -161,6 +162,18 @@ else ifneq ($(filter $(comp),$(NAG)),)
    flags = $(OPTS) -fpp -kind=byte -ieee=full -mdir $(dirmod) -I $(dirmod) -I $(dirmodpk2)
    flagdynlib = -PIC -Wl,-shared
 
+else ifneq ($(filter $(comp),$(FLANG)),)
+   ifeq ($(opt),)
+      OPTS += -O3
+   else ifeq ($(opt),check)
+      OPTS += -Og -fimplicit-none   
+   else       
+      OPTS += $(opt)
+   endif   
+   cpflags = $(OPTS)    
+   flagcomp = $(OPTS)
+   flags = $(OPTS) -cpp -module-dir $(dirmod) -I $(dirmodpk2)
+   
 else
    $(error unknown compiler ($(comp)), please adapt the pk2/app/calmat/src/makefile)
 
@@ -188,7 +201,8 @@ libcalmat = $(dirlib)/$(libr)
 
 calmat: $(obj)
 #  linking with the static pk2 library (=> calmat_s.exe):
-	$(comp) $(obj) $(flags) $(libs) -o $(direxe)/$(execs)
+#	$(comp) $(obj) $(flags) $(libs) -o $(direxe)/$(execs)
+	$(comp) $(obj) $(OPTS) $(libs) -o $(direxe)/$(execs)
 #  linking with the shared pk2 library (=> calmat_d.exe):
 #	$(comp) $(obj) $(flags) $(libd) -o $(direxe)/$(execd)
 #  static calmat library:

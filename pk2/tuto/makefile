@@ -94,6 +94,11 @@ else
          opt_optim = -O0
          opt_check = -C=all
       endif
+
+      ifeq ($(comp),flang)
+         opt_optim = -O0
+      endif
+            
    else
 #
 #     User's options:
@@ -123,6 +128,9 @@ ifeq ($(comp),nagfor)
    cflags += -fpp -kind=byte -ieee=full
 endif
 
+ifeq ($(comp),flang)
+   cflags += -cpp
+endif
 
 ################################################################################
 # Compilation:
