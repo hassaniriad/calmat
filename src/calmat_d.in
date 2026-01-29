@@ -28,7 +28,12 @@ do
    shift
 done
 
-$calmatbin/calmat_d.exe $args
+if command -v rlwrap >/dev/null 2>&1
+then
+   rlwrap $calmatbin/calmat_d.exe $args
+else
+   $calmatbin/calmat_d.exe $args
+fi
 
 /bin/rm -f libpk2_d.so .tmp_$file.f90 .tmp_$file.o  addfun.out  userfunc_m.mod 
 /bin/rm -f .tmp_stdout_addfun

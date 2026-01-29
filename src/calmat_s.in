@@ -28,9 +28,19 @@ done
 
 if [ $newfunc -gt 0 ] 
 then
-   ./.tmp_calmat.exe $args
+   if command -v rlwrap >/dev/null 2>&1
+   then
+      rlwrap ./.tmp_calmat.exe $args
+   else
+      ./.tmp_calmat.exe $args
+   fi
 else
-   $calmatbin/calmat_s.exe $args
+   if command -v rlwrap >/dev/null 2>&1
+   then
+      rlwrap $calmatbin/calmat_s.exe $args
+   else
+      $calmatbin/calmat_s.exe $args
+   fi
 fi 
 
 /bin/rm -f  .tmp_$file.a  .tmp_$file.f90 .tmp_calmat.o  .tmp_calmat.exe .tmp_stdout_addfun
