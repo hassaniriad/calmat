@@ -499,6 +499,7 @@ CONTAINS
          if ( unit == STDIN ) return
          if ( flag%code < 0 ) then ! if EOF reached
             call err_MoveAlloc ( from = flag, to = stat ) 
+            is_comBlk = .false.
             exit
          endif 
          cycle 
@@ -519,12 +520,19 @@ CONTAINS
 
          if ( is_comBlk ) then
             i = index(segm, endComBlk, back=.true.)
+            
+            if ( i /= 0 ) then
+               if ( util_IsEnclosed ( segm, i, "'", "'", stat ) .or. &
+                    util_IsEnclosed ( segm, i, '"', '"', stat ) ) i = 0
+            end if
+            
             is_comBlk = ( i == 0 )
             if ( .not. is_comBlk ) segm = segm(i+lendComBlk:)
             if ( is_comBlk .or. ( .not. is_comBlk .and. len_trim(segm) == 0 ) ) then
                if ( unit == STDIN ) return
                cycle
-            end if        
+            end if 
+       
          end if
       end if
       
