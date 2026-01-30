@@ -30,7 +30,7 @@ done
 
 if command -v rlwrap >/dev/null 2>&1
 then
-   rlwrap $calmatbin/calmat_d.exe $args
+   rlwrap -c -w 0 $calmatbin/calmat_d.exe $args
 else
    $calmatbin/calmat_d.exe $args
 fi

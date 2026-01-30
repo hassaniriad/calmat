@@ -30,14 +30,14 @@ if [ $newfunc -gt 0 ]
 then
    if command -v rlwrap >/dev/null 2>&1
    then
-      rlwrap ./.tmp_calmat.exe $args
+      rlwrap -c -w 0 ./.tmp_calmat.exe $args
    else
       ./.tmp_calmat.exe $args
    fi
 else
    if command -v rlwrap >/dev/null 2>&1
    then
-      rlwrap $calmatbin/calmat_s.exe $args
+      rlwrap -c -w 0 $calmatbin/calmat_s.exe $args
    else
       $calmatbin/calmat_s.exe $args
    fi
