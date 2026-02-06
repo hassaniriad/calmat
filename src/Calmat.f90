@@ -343,7 +343,8 @@ CONTAINS
 !     
       if ( ui /=  IZERO ) then 
          rec = util_GetRecord ( unit=ui, stat=G_flagerr, comments=['//','/*','*/'], &
-                                rmblk=.false., nlines = numl, contSymb=['...','&  '] ) 
+                                rmblk=.false., rptab=.true., nlines = numl, &
+                                contSymb=['...','&  '] ) 
       else
          rec = G_flows(flowId)%expression
          numl = 1

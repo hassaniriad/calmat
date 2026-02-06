@@ -383,14 +383,14 @@ CONTAINS
    
    
 !=============================================================================================
-   FUNCTION util_GetRecord ( unit, stat, comments, contSymb, rmblk, nlines, firstl, Rec0 ) &
-            result( Rec )
+   FUNCTION util_GetRecord ( unit, stat, comments, contSymb, rmblk, rptab, nlines, firstl,  &
+            Rec0 ) result( Rec )
 !=============================================================================================
    integer  (Ikind),                        intent(in    ) :: unit
    type     (err_t),                        intent(in out) :: stat 
    character(len=*), optional,              intent(in    ) :: comments(:)
    character(len=*), optional,              intent(in    ) :: contSymb(:)
-   logical         , optional,              intent(in    ) :: rmblk
+   logical         , optional,              intent(in    ) :: rmblk, rptab
    integer  (Ikind), optional,              intent(   out) :: nlines, firstl
    character(len=:), optional, allocatable, intent(   out) :: Rec0   
    character(len=:),           allocatable                 :: Rec   
@@ -418,7 +418,7 @@ CONTAINS
    character(len=:), allocatable :: segm0, segm, com, beginComBlk, endComBlk, contSymb_(:)
    integer  (Ikind), allocatable :: loc(:)
    integer  (Ikind)              :: plast, pend, i, n, numl, lsegm, lbeginComBlk, lendComBlk
-   logical                       :: rm, is_first, continueRead
+   logical                       :: rm, is_first, continueRead, rp
    type     (err_t)              :: flag
    logical         , SAVE        :: is_comBlk = .false.
    integer  (Ikind), allocatable :: lenSymb(:)
@@ -460,7 +460,15 @@ CONTAINS
       rm = rmblk
    else
       rm = .true.
-   end if         
+   end if
+!
+!- Tabulations will be replaced by spaces (default) from "Rec" if "rp" is .true.:
+!
+   if ( present(rptab) ) then
+      rp = rptab
+   else
+      rp = .true.
+   end if   
          
    Rec = '' ; if ( present(Rec0) ) Rec0 = ''
          
@@ -593,10 +601,20 @@ CONTAINS
       end if
       
    end do  
+
+   if ( rm ) then
 !
-!- Remove spaces and tabs from the resulting string (if not between quotes):
+!-    Remove spaces and tabs from the resulting string (if not between quotes):
 !   
-   if ( rm ) Rec = trim( util_RemoveSpaces2 ( adjustl(Rec), opt='nqt', stat=flag ) )       
+      Rec = trim( util_RemoveSpaces2 ( adjustl(Rec), opt='nqt', stat=flag ) )
+       
+   else if ( rp ) then
+!
+!-    Replace tabulations by spaces from the resulting string (if not between quotes):
+!   
+      Rec =  util_ReplaceSubstring2 ( Rec, char(9), char(32), opcl='""'//"''", stat=flag )
+
+   end if
 
    END FUNCTION util_GetRecord
    
