@@ -166,7 +166,7 @@ else ifneq ($(filter $(comp),$(FLANG)),)
    ifeq ($(opt),)
       OPTS += -O3
    else ifeq ($(opt),check)
-      OPTS += -Og -fimplicit-none   
+      OPTS += -O0 -fimplicit-none   
    else       
       OPTS += $(opt)
    endif   
@@ -199,7 +199,9 @@ obj  = $(patsubst %.f90,$(dirobj)/%.o,$(src))
 
 libcalmat = $(dirlib)/$(libr)
 
-calmat: $(obj)
+libpk2 = $(dirlibpk2)/libpk2.a
+
+calmat: $(obj) $(libpk2)
 #  linking with the static pk2 library (=> calmat_s.exe):
 #	$(comp) $(obj) $(flags) $(libs) -o $(direxe)/$(execs)
 	$(comp) $(obj) $(OPTS) $(libs) -o $(direxe)/$(execs)
@@ -250,35 +252,40 @@ calmat: $(obj)
 dummy:  
 	@# just to force CalmatVersion to be always compiled (it initialiazes compil date)
 
-$(dirobj)/CalmatVersion.o: CalmatVersion.f90 dummy
+$(dirobj)/CalmatVersion.o: CalmatVersion.f90 \
+                           dummy             \
+                           $(libpk2)
 	@echo " "
-	@echo $(pk2dir)
 	$(call colorRed, "> compiling CalmatVersion.f90")
 	@echo " "
 	$(comp) $(flags) -c CalmatVersion.f90 -o $(dirobj)/CalmatVersion.o
 
-$(dirobj)/CalmatConstants.o: CalmatConstants.f90
+$(dirobj)/CalmatConstants.o: CalmatConstants.f90 \
+                             $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling CalmatConstants.f90")
 	@echo " "
 	$(comp) $(flags) -c CalmatConstants.f90 -o $(dirobj)/CalmatConstants.o
 
-$(dirobj)/CalmatInstruction.o: CalmatInstruction.f90      \
-                               $(dirobj)/CalmatConstants.o
+$(dirobj)/CalmatInstruction.o: CalmatInstruction.f90       \
+                               $(dirobj)/CalmatConstants.o \
+                               $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling CalmatInstruction.f90")
 	@echo " "
 	$(comp) $(flags) -c CalmatInstruction.f90 -o $(dirobj)/CalmatInstruction.o
 
-$(dirobj)/CalmatVar.o: CalmatVar.f90              \
-                       $(dirobj)/CalmatConstants.o 
+$(dirobj)/CalmatVar.o: CalmatVar.f90               \
+                       $(dirobj)/CalmatConstants.o \
+                       $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling CalmatVar.f90")
 	@echo " "
 	$(comp) $(flags) -c CalmatVar.f90 -o $(dirobj)/CalmatVar.o
 
-$(dirobj)/CalmatObject.o: CalmatObject.f90           \
-                          $(dirobj)/CalmatConstants.o
+$(dirobj)/CalmatObject.o: CalmatObject.f90            \
+                          $(dirobj)/CalmatConstants.o \
+                          $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling CalmatObject.f90")
 	@echo " "
@@ -288,14 +295,16 @@ $(dirobj)/CalmatGlobal.o: CalmatGlobal.f90              \
                           $(dirobj)/CalmatConstants.o   \
                           $(dirobj)/CalmatInstruction.o \
                           $(dirobj)/CalmatVar.o         \
-                          $(dirobj)/CalmatObject.o
+                          $(dirobj)/CalmatObject.o      \
+                          $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling CalmatGlobal.f90")
 	@echo " "
 	$(comp) $(flags) -c CalmatGlobal.f90 -o $(dirobj)/CalmatGlobal.o
 
 $(dirobj)/CalmatUtil.o: CalmatUtil.f90           \
-                        $(dirobj)/CalmatGlobal.o
+                        $(dirobj)/CalmatGlobal.o \
+                        $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling CalmatUtil.f90")
 	@echo " "
@@ -303,7 +312,8 @@ $(dirobj)/CalmatUtil.o: CalmatUtil.f90           \
 
 $(dirobj)/CalmatSetNGet.o: CalmatSetNGet.f90        \
                            $(deps_setnget)          \
-                           $(dirobj)/CalmatGlobal.o
+                           $(dirobj)/CalmatGlobal.o \
+                           $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling CalmatSetNGet.f90")
 	@echo " "
@@ -311,7 +321,8 @@ $(dirobj)/CalmatSetNGet.o: CalmatSetNGet.f90        \
 
 $(dirobj)/CalmatCmd.o: CalmatCmd.f90             \
                        $(dirobj)/CalmatGlobal.o  \
-                       $(dirobj)/CalmatUtil.o
+                       $(dirobj)/CalmatUtil.o    \
+                       $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling CalmatCmd.f90")
 	@echo " "
@@ -329,14 +340,16 @@ $(dirobj)/Calmat.o: Calmat.f90                  \
                     $(dirobj)/CalmatUtil.o      \
                     $(dirobj)/CalmatSetNGet.o   \
                     $(dirobj)/CalmatCmd.o       \
-                    $(dirobj)/f90getopt.o 
+                    $(dirobj)/f90getopt.o       \
+                    $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling Calmat.f90")
 	@echo " "
 	$(comp) $(flags) -c Calmat.f90 -o $(dirobj)/Calmat.o
 
 $(dirobj)/main.o: main.f90           \
-                  $(dirobj)/Calmat.o            
+                  $(dirobj)/Calmat.o \
+                  $(libpk2)
 	@echo " "
 	$(call colorRed, "> compiling main.f90")
 	@echo " "

@@ -162,7 +162,7 @@ else ifneq ($(filter $(comp),$(FLANG)),)
    ifeq ($(opt),)
       OPTS += -O3
    else ifeq ($(opt),check)
-      OPTS += -Og -fimplicit-none   
+      OPTS += -O0 -fimplicit-none   
    else       
       OPTS += $(opt)
    endif   
