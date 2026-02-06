@@ -6,7 +6,6 @@
 // since it contains a fortran procedure that need to be compiled by calmat
 
 
-
 // ====================================================================
 // Flow of a power-law fluid in a channel driven by a pressure gradient
 // ====================================================================
@@ -104,7 +103,8 @@ clear
 
 
    fortranproc [eta] = visco ( x, v, beta, alpha, eps )
-      real              :: x(:), v(:), beta, alpha, eps
+      real              :: x(:), v(:), &
+                           beta, alpha, eps
       real, allocatable :: eta(:)
 
       if ( .not. allocated(eta) ) allocate(eta, mold=v)
@@ -121,3 +121,6 @@ clear
             end do
          end subroutine deriv
    endfortranproc visco
+
+
+
