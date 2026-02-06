@@ -114,7 +114,8 @@ CONTAINS
    numl = 0
    
    do
-      rec = util_GetRecord ( ui, stat, rmblk=.false., comments=['//','/*','*/'], nlines = n, rec0=rec0 )
+      rec = util_GetRecord ( ui, stat, rmblk=.false., comments=['//','/*','*/'], &
+                             nlines=n, rec0=rec0, contSymb=['...','&  '] )
       if ( stat > IZERO ) then ; call stat%AddTrace(HERE) ; exit ; end if
 
       numl = numl + n
