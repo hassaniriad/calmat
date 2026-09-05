@@ -1057,6 +1057,30 @@ CONTAINS
 !---------------------------------------------------------------------------------------------
 !  Return a pointer associated to the matrix values of self with rank remapping when these
 !  values are integers
+!
+!  Note (09/2026): with some distribution of gfortran (e.g. 15.2 on Ubuntu), the pointer
+!  association in the following select type:
+!
+!        select type ( p => self%m )
+!           type is (rk2_t)
+!              ptr(1:size(p%v)) => p%v
+!
+!  results in an error compilation.
+!  
+!  The reason is well explained by Claude:
+!
+!  The standard (F2018) requires that, for a pointer assignment with rank remapping 
+!  (ptr(1:n) => target), the target be rank 1 or “simply contiguous”. 
+! 
+!  In my previous select type p is the associate name of a select type on an allocatable class
+!  component (bk2_t) and p%v is an allocatable so always "simply contiguous".
+!  However, the standard specifies that the associate name of an associate/select type does 
+!  not inherit the POINTER or ALLOCATABLE attributes of the selector. As a result, p%v (the
+!  allocable component of an entity is not recognized, in the strict, syntactic sense, as 
+!  "simply contiguous"
+!  
+!  The workaround proposed by Claude is to use an intermediate pointer that is explicitly
+!  CONTIGUOUS and has the same rank as v
 !-----------------------------------------------------------------------------------R.H. 03/23       
 
 !- local variables --------------------------------------------------------------------------- 
@@ -1067,8 +1091,13 @@ CONTAINS
 
    if ( allocated(self%m) ) then
       select type ( p => self%m )
-         type is (ik2_t)
-            ptr(1:size(p%v)) => p%v
+         type is (ik2_t)            
+            !!ptr(1:size(p%v)) => p%v !< see the note above
+            block
+               integer(Ikind), pointer, contiguous :: q(:,:)
+               q => p%v             ! OK: target is an allocatable => always contiguous
+               ptr(1:size(q)) => q  ! OK: q is CONTIGUOUS => "simply contiguous"
+            end block
          class default
             if ( present(stat) ) &
                call stat%set ( stat = UERROR, where = HERE, &
@@ -1193,7 +1222,13 @@ CONTAINS
    if ( allocated(self%m) ) then
       select type ( p => self%m )
          type is (rk2_t)
-            ptr(1:size(p%v)) => p%v
+            !!ptr(1:size(p%v)) => p%v
+            block
+               real(Rkind), pointer, contiguous :: q(:,:)
+               q => p%v             ! OK: target is an allocatable => always contiguous
+               ptr(1:size(q)) => q  ! OK: q is CONTIGUOUS => "simply contiguous"
+            end block
+
          class default
             if ( present(stat) ) &
                call stat%set ( stat = UERROR, where = HERE, &
@@ -1318,7 +1353,12 @@ CONTAINS
    if ( allocated(self%m) ) then
       select type ( p => self%m )
          type is (ck2_t)
-            ptr(1:size(p%v)) => p%v
+            !!ptr(1:size(p%v)) => p%v
+            block
+               complex(Rkind), pointer, contiguous :: q(:,:)
+               q => p%v             ! OK: target is an allocatable => always contiguous
+               ptr(1:size(q)) => q  ! OK: q is CONTIGUOUS => "simply contiguous"
+            end block
          class default
             if ( present(stat) ) &
                call stat%set ( stat = UERROR, where = HERE, &
@@ -1443,7 +1483,12 @@ CONTAINS
    if ( allocated(self%m) ) then
       select type ( p => self%m )
          type is (lk2_t)
-            ptr(1:size(p%v)) => p%v
+            !!ptr(1:size(p%v)) => p%v
+            block
+               logical, pointer, contiguous :: q(:,:)
+               q => p%v             ! OK: target is an allocatable => always contiguous
+               ptr(1:size(q)) => q  ! OK: q is CONTIGUOUS => "simply contiguous"
+            end block
          class default
             if ( present(stat) ) &
                call stat%set ( stat = UERROR, where = HERE, &
@@ -1568,7 +1613,13 @@ CONTAINS
    if ( allocated(self%m) ) then
       select type ( p => self%m )
          type is (sk2_t)
-            ptr(1:size(p%v)) => p%v
+            !!ptr(1:size(p%v)) => p%v
+            block
+               type(str_t), pointer, contiguous :: q(:,:)
+               q => p%v             ! OK: target is an allocatable => always contiguous
+               ptr(1:size(q)) => q  ! OK: q is CONTIGUOUS => "simply contiguous"
+            end block
+
          class default
             if ( present(stat) ) &
                call stat%set ( stat = UERROR, where = HERE, &
