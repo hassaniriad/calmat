@@ -45,10 +45,11 @@ CONTAINS
 
 !=============================================================================================
    RECURSIVE SUBROUTINE Calmat ( fileIn , exprIn , parseOnly, evaluate, &
-                                 warning, welcome, dispRes  , stat      )
+                                 warning, welcome, dispRes  , stat    , &
+                                 unitOut )
 !=============================================================================================
    character(len=*), optional, intent(in    ) :: fileIn, exprIn
-   integer  (Ikind), optional, intent(in    ) :: evaluate
+   integer  (Ikind), optional, intent(in    ) :: evaluate, unitOut
    logical         , optional, intent(in    ) :: warning, welcome, dispRes
    type     (err_t), optional, intent(in out) :: stat
    integer  (Ikind), optional, intent(   out) :: parseOnly
@@ -84,6 +85,8 @@ CONTAINS
 !  . evaluate (optional): execute and evaluate the set of instructions corresponding to the
 !                         flow #evaluate. This flow corresponds to the analysis performed 
 !                         during a previous call to calmat (with option "parseOnly")
+!
+!  . unitOut (optional): the unit of the output file. Default: stdout
 !
 !    Note: (1) when neither fileIn nor exprIn are present, calmat runs in interactive or in  
 !              batch mode according to the command line arguments used
@@ -166,7 +169,7 @@ CONTAINS
 !
 !- Initialize predefined variables, list of variables, ..., and user's settings
 !   
-   call Calmat_Initialize ( warning, welcome, dispRes, stat ) 
+   call Calmat_Initialize ( warning, welcome, dispRes, unitOut, stat ) 
 
    G_disp = dispr
 !
@@ -1277,9 +1280,10 @@ CONTAINS
       
    
 !=============================================================================================
-   RECURSIVE SUBROUTINE Calmat_Initialize ( warning, welcome, dispRes, stat )
+   RECURSIVE SUBROUTINE Calmat_Initialize ( warning, welcome, dispRes, unitOut, stat )
 !=============================================================================================
    logical    , optional, intent(in    ) :: warning, welcome, dispRes
+   integer    , optional, intent(in    ) :: unitOut
    type(err_t), optional, intent(in out) :: stat
 !--------------------------------------------------------------------------------------------- 
 ! Initializes 
@@ -1317,8 +1321,14 @@ CONTAINS
    else
       if ( first ) warn = G_OFF
    end if
+
+   if ( present(unitOut) ) then
+      G_uo = unitOut
+   else if ( .not. G_init ) then
+      G_uo = STDOUT
+   end if
       
-   call err_SetHaltingMode ( halting = halting, unit = STDOUT, DisplayWarning = warn ) 
+   call err_SetHaltingMode ( halting = halting, DisplayWarning = warn, unit = G_uo )    
 !
 !- Display or not the result. By default G_disp is used (initialized in CalmatGlobal_m)
 !   
@@ -1520,7 +1530,7 @@ CONTAINS
    warn_save = warn ; disp_save = dispr
 
    call Calmat ( fileIn  = G_filedef, warning = .true., welcome = .false., &
-                 dispRes = .false.  , stat    =  flag                      )
+                 dispRes = .false.  , stat    =  flag , unitOut = unitOut  )
 
    if ( flag > IZERO ) then
       call flag%AddMsg ( before = .true., newline = .true., &
@@ -1534,7 +1544,7 @@ CONTAINS
    
    if ( present(welcome) ) then ; welc = welcome ; else ; welc = G_welcome ; end if
    
-   call err_SetHaltingMode ( halting = halting, unit = STDOUT, DisplayWarning = warn )  
+   call err_SetHaltingMode ( halting = halting, unit = G_uo, DisplayWarning = warn )  
    
    G_disp = dispr
  
