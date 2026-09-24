@@ -148,6 +148,11 @@ endif
 # Les triples protections empêchent le compilateur d'éclater les chaînes en morceaux s'il y a des espaces
 flags += -D__CDATE='"/$(shell date)/"' -D__DIR='"/$(abspk2dir)/"' -D__COMP='"/$(comp)/"'
 
+# CORRECTIF LINUX : 
+ifneq ($(UNAME_S),Darwin)
+   flags += -fPIC
+endif
+
 ################################################################################
 # Source & Objects Management
 #-------------------------------------------------------------------------------
