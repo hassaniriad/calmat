@@ -1384,7 +1384,7 @@ CONTAINS
    character(len=:), allocatable :: msg, usedCompiler, flags, flagdyn, buf, &
                                     pk2dir, dirmod, dirlib, dirobj, f90file, objfile
    character(LGSTR)              :: iomsg
-   integer                       :: uc, err, estat, endf
+   integer                       :: uc, err, estat, endf, n
 !--------------------------------------------------------------------------------------------- 
 
    f90file = libName //'.f90'
@@ -1393,51 +1393,63 @@ CONTAINS
 !- Use the same compiler that was used to compile this program:
 !
 #ifdef __COMP
-   usedCompiler = __COMP
+   usedCompiler = trim(adjustl(__COMP))
+   n = len(usedCompiler)
+   if ( usedCompiler(1:1) == '/' .and. usedCompiler(n:n) == '/' ) &
+      usedCompiler = usedCompiler(2:n-1)
 #else
    usedCompiler = util_stringLow(compiler_version())
-   if ( index(usedCompiler,'nag') > 0 ) then
-      usedCompiler = 'nagfor'
-   else if ( index(usedCompiler,'gcc') > 0 .or. index(usedCompiler,'gfortran') > 0) then
-      usedCompiler = 'gfortran'
-   else if ( index(usedCompiler,'ifort') > 0 ) then
-      usedCompiler = 'ifort'
-   else if ( index(usedCompiler,'ifx') > 0 ) then
-      usedCompiler = 'ifx'
-   else if ( index(usedCompiler,'flang-new') > 0 ) then
-      usedCompiler = 'flang-new'
-   else if ( index(usedCompiler,'flang') > 0 ) then
-      usedCompiler = 'flang'
-   end if
 #endif
 
-   if ( usedCompiler == 'nagfor' ) then
+   if ( index(usedCompiler,'nag') > 0 ) then
+      usedCompiler = 'nagfor'
       flags = ' -fpp -kind=byte -ieee=full '
       if ( len_trim(moduledir) > 0 ) flags = flags // '-mdir '//moduledir//' '
       flagdyn = ' -PIC -Wl,-shared '
-   else if ( usedCompiler == 'ifort' .or.  usedCompiler == 'ifx' ) then
-      flags = ' -fpp '
-      if ( len_trim(moduledir) > 0 ) flags = flags // '-module '//moduledir//' '
-      flagdyn = ' -fPIC -shared '
-   else if ( usedCompiler == 'gfortran' ) then
+      
+   else if ( index(usedCompiler,'gcc') > 0 .or. index(usedCompiler,'gfortran') > 0) then
+      usedCompiler = 'gfortran'
       flags = ' -cpp '
       if ( len_trim(moduledir) > 0 ) flags = flags // '-J '//moduledir//' '
       flagdyn = ' -fPIC -shared '
-   else if ( usedCompiler == 'flang' .or. usedCompiler == 'flang-new') then
+
+   else if ( index(usedCompiler,'ifort') > 0 ) then
+      usedCompiler = 'ifort'
+      flags = ' -fpp '
+      if ( len_trim(moduledir) > 0 ) flags = flags // '-module '//moduledir//' '
+      flagdyn = ' -fPIC -shared '
+      
+   else if ( index(usedCompiler,'ifx') > 0 ) then
+      usedCompiler = 'ifx'
+      flags = ' -fpp '
+      if ( len_trim(moduledir) > 0 ) flags = flags // '-module '//moduledir//' '
+      flagdyn = ' -fPIC -shared '
+
+   else if ( index(usedCompiler,'flang-new') > 0 ) then
+      usedCompiler = 'flang-new'
       flags = ' -cpp '
       if ( len_trim(moduledir) > 0 ) flags = flags // '-module-dir '//moduledir//' '
       flagdyn = ' -fPIC -shared '
+
+   else if ( index(usedCompiler,'flang') > 0 ) then
+      usedCompiler = 'flang'
+      flags = ' -cpp '
+      if ( len_trim(moduledir) > 0 ) flags = flags // '-module-dir '//moduledir//' '
+      flagdyn = ' -fPIC -shared '
+
    else
       stat = err_t(stat=UERROR, msg="Unknown compiler '"//usedCompiler// &
                   "'. Please update addfun.f90 with your compiler.", where=here)
-      return
+      return   
    end if
 !
 !- Absolute path of the pk2 installation directory (the pk2 library must be compiled with
 !  the -DDIR option):
 !
 #ifdef __DIR
-   pk2dir = __DIR
+   pk2dir = trim(adjustl(__DIR))
+   n = len(pk2dir)
+   if ( pk2dir(1:1) == '/' .and. pk2dir(n:n) == '/' ) pk2dir = pk2dir(2:n-1)
 #else
    stat = err_t(stat=UERROR, msg="pk2 should be compiled with -DDIR flag", where=here)
    return

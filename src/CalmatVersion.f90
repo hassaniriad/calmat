@@ -27,17 +27,25 @@ CONTAINS
                              G_numversion, G_filedef, G_compilDate, G_compilOPts
 !---------------------------------------------------------------------------------------------
 
+   integer :: n
+   
    G_numversion = G_VERSIONID
    G_filedef    = G_FDEF
    
 #ifdef __CDATE
-   G_compilDate = __CDATE
+   G_compilDate = trim(adjustl(__CDATE))
+   n = len(G_compilDate)
+   if ( G_compilDate(1:1) == '/' .and. G_compilDate(n:n) == '/' ) &
+      G_compilDate = G_compilDate(2:n-1)
 #else
    G_compilDate = ""
 #endif   
 
 #ifdef __COPTS   
-   G_compilOPts = __COPTS
+   G_compilOPts = trim(adjustl(__COPTS))
+   n = len(G_compilOPts)
+   if ( G_compilOPts(1:1) == '/' .and. G_compilOPts(n:n) == '/' ) &
+      G_compilOPts = G_compilOPts(2:n-1)
 #else
    G_compilOPts = ""
 #endif     
